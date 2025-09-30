@@ -1,27 +1,221 @@
-/* 导航栏卡其色（无任何干扰） */
+/* 1. 全局基础样式与背景设置 */
+body {
+  /* 背景图突出设置 */
+  background-image: url('/img/bj.jpg') !important;
+  background-size: cover;
+  background-attachment: fixed;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: rgba(255, 255, 255, 0.15) !important;
+  background-blend-mode: soft-light;
+  
+  /* 字体优化 */
+  font-family: "Inter", "PingFang SC", sans-serif;
+  line-height: 1.65;
+}
+
+/* 2. 导航栏样式（卡其色主题） */
 #navbar.navbar {
-  background-color: rgba(238, 222, 204, 0.4) !important;
-  backdrop-filter: blur(6px) !important;
+  background-color: rgba(238, 222, 204, 0.4) !important; /* 卡其色主色 */
+  backdrop-filter: blur(6px) !important; /* 低磨砂感 */
   border-bottom: 1px solid rgba(238, 222, 204, 0.6) !important;
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.02) !important;
+  height: 58px !important;
+  padding: 0 30px !important;
 }
 
 #navbar.navbar.scroll {
-  background-color: rgba(238, 222, 204, 0.6) !important;
+  background-color: rgba(238, 222, 204, 0.6) !important; /* 滚动时加深 */
+  height: 52px !important;
 }
 
 /* 导航菜单文字 */
 #navbar .menus_item a {
-  color: #5a4a38 !important;
+  color: #5a4a38 !important; /* 卡其色配套文字 */
+  font-weight: 500 !important;
+  padding: 0 12px !important;
 }
 
 #navbar .menus_item a:hover {
   color: #3d2f1f !important;
+  transform: translateY(-1px) !important;
 }
 
-/* 背景图保持清晰 */
-body {
-  background-image: url('/img/bj.jpg') !important;
-  background-size: cover;
-  background-attachment: fixed;
-  background-color: rgba(255, 255, 255, 0.1) !important;
+/* 3. 内容卡片样式 */
+#content-inner {
+  background-color: rgba(255, 255, 255, 0.5) !important; /* 高透明度 */
+  backdrop-filter: blur(4px) !important;
+  border-radius: 16px !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.03) !important;
+  padding: 30px !important;
+  margin: 30px auto !important;
+  max-width: 900px !important;
+}
+
+/* 4. 文章卡片交互效果 */
+article.post-card {
+  transition: all 0.3s ease !important;
+}
+
+article.post-card:hover {
+  transform: translateY(-5px) !important;
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* 卡片图片放大效果 */
+.post-card .post-bg {
+  transition: transform 0.5s ease !important;
+}
+
+.post-card:hover .post-bg {
+  transform: scale(1.03) !important;
+}
+
+/* 5. 顶部进度条样式 */
+#nprogress .bar {
+  background: #eedecc !important; /* 卡其色进度条 */
+  height: 3px !important;
+}
+
+#nprogress .peg {
+  box-shadow: 0 0 10px #eedecc, 0 0 5px #eedecc !important;
+}
+
+/* 6. 图片样式优化 */
+img {
+  border-radius: 8px !important;
+  transition: opacity 0.5s ease !important;
+  margin: 20px auto !important;
+  display: block !important;
+  max-width: 90% !important;
+}
+
+/* 图片加载动画 */
+img:not([src]) {
+  background: #f5f5f5;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 0.3; }
+}
+
+/* 7. 代码块美化 */
+figure.highlight {
+  border-radius: 8px !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) !important;
+  margin: 20px 0 !important;
+  padding: 15px 0 !important;
+}
+
+.highlight code {
+  font-family: "Fira Code", monospace !important;
+  font-size: 14px !important;
+  line-height: 1.6 !important;
+}
+
+/* 8. 侧边栏样式 */
+aside .card-widget .card-header {
+  border-bottom: 1px solid #f0e8dc !important;
+  padding-bottom: 8px !important;
+  margin-bottom: 15px !important;
+}
+
+aside .card-widget .card-header span {
+  color: #8b7d6b !important;
+  font-weight: 600 !important;
+}
+
+/* 标签云悬停效果 */
+.tagcloud a {
+  transition: all 0.3s ease !important;
+  border: 1px solid transparent !important;
+}
+
+.tagcloud a:hover {
+  border-color: #eedecc !important;
+  transform: scale(1.08) !important;
+}
+
+/* 9. 链接样式 */
+a {
+  color: #5a4a38 !important;
+  text-decoration: none !important;
+  position: relative;
+}
+
+a::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -2px;
+  left: 0;
+  background-color: #c8b6a6; /* 卡其色下划线 */
+  transition: width 0.3s ease;
+}
+
+a:hover::after {
+  width: 100%;
+}
+
+/* 10. 按钮样式 */
+.btn {
+  background-color: rgba(238, 222, 204, 0.7) !important;
+  color: #5a4a38 !important;
+  border-radius: 8px !important;
+  border: none !important;
+  padding: 8px 16px !important;
+  box-shadow: 0 2px 8px rgba(238, 222, 204, 0.4) !important;
+}
+
+.btn:hover {
+  background-color: rgba(238, 222, 204, 0.9) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* 11. 页脚样式 */
+#footer {
+  background-color: rgba(255, 255, 255, 0.5) !important;
+  backdrop-filter: blur(4px) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.2) !important;
+  padding: 20px 0 !important;
+  margin-top: 50px !important;
+}
+
+#footer .copyright {
+  color: #8b7d6b !important;
+  font-size: 14px !important;
+  padding: 15px 0 !important;
+  border-top: 1px solid #f0e8dc !important;
+  margin-top: 20px !important;
+}
+
+#footer .copyright a {
+  color: #8b7d6b !important;
+  margin: 0 5px !important;
+}
+
+/* 12. 响应式适配 */
+@media (max-width: 768px) {
+  #content-inner {
+    padding: 20px 15px !important;
+    margin: 15px !important;
+  }
+  #navbar {
+    padding: 0 15px !important;
+  }
+  img {
+    max-width: 100% !important;
+  }
+}
+
+/* 13. 强制覆盖主题默认变量（防止蓝色残留） */
+:root {
+  --primary-color: #eedecc !important;
+  --primary-color-light: #d9cbb8 !important;
+  --primary-color-dark: #c8b6a6 !important;
+  --blue: #eedecc !important;
 }
