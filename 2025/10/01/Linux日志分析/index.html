@@ -1,0 +1,243 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Linux日志分析 | Q1yl</title><meta name="author" content="扬祺"><meta name="copyright" content="扬祺"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="1.有多少 IP 在爆破主机 SSH 的 root 帐号1.&#x2F;var&#x2F;log是 Linux 默认日志目录，比如 SSH 登录日志、系统操作日志都存在这里，是分析的核心素材。 1cd &#x2F;var&#x2F;log   2.输入命令tar -czvf log.tar.gz .&#x2F; 代码解释  tar -czvf是 “打包 + 压缩” 命令：-c创建压缩包，-z用 gzip 压缩（让文件更小），-v显示压缩过程，-f">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Linux日志分析">
+<meta property="og:url" content="http://example.com/2025/10/01/Linux%E6%97%A5%E5%BF%97%E5%88%86%E6%9E%90/index.html">
+<meta property="og:site_name" content="Q1yl">
+<meta property="og:description" content="1.有多少 IP 在爆破主机 SSH 的 root 帐号1.&#x2F;var&#x2F;log是 Linux 默认日志目录，比如 SSH 登录日志、系统操作日志都存在这里，是分析的核心素材。 1cd &#x2F;var&#x2F;log   2.输入命令tar -czvf log.tar.gz .&#x2F; 代码解释  tar -czvf是 “打包 + 压缩” 命令：-c创建压缩包，-z用 gzip 压缩（让文件更小），-v显示压缩过程，-f">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/bz.jpg">
+<meta property="article:published_time" content="2025-09-30T23:36:35.000Z">
+<meta property="article:modified_time" content="2025-09-30T23:36:56.216Z">
+<meta property="article:author" content="扬祺">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/bz.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Linux日志分析",
+  "url": "http://example.com/2025/10/01/Linux%E6%97%A5%E5%BF%97%E5%88%86%E6%9E%90/",
+  "image": "http://example.com/img/bz.jpg",
+  "datePublished": "2025-09-30T23:36:35.000Z",
+  "dateModified": "2025-09-30T23:36:56.216Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "扬祺",
+      "url": "http://example.com"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/2025/10/01/Linux%E6%97%A5%E5%BF%97%E5%88%86%E6%9E%90/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Linux日志分析',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="/css/custom.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Q1yl</span></a><a class="nav-page-title" href="/"><span class="site-name">Linux日志分析</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"></div></nav><div id="post-info"><h1 class="post-title">Linux日志分析</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-09-30T23:36:35.000Z" title="发表于 2025-10-01 07:36:35">2025-10-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-09-30T23:36:56.216Z" title="更新于 2025-10-01 07:36:56">2025-10-01</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h1 id="1-有多少-IP-在爆破主机-SSH-的-root-帐号"><a href="#1-有多少-IP-在爆破主机-SSH-的-root-帐号" class="headerlink" title="1.有多少 IP 在爆破主机 SSH 的 root 帐号"></a>1.有多少 IP 在爆破主机 SSH 的 root 帐号</h1><p>1.<code>/var/log</code>是 Linux 默认日志目录，比如 SSH 登录日志、系统操作日志都存在这里，是分析的核心素材。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cd /var/log</span><br></pre></td></tr></table></figure>
+
+<p><img src="https://raw.githubusercontent.com/3530268799-design/yanqo/main/image-20250928204406862.png" alt="image-20250928204406862"></p>
+<p>2.输入命令<code>tar -czvf log.tar.gz ./</code></p>
+<p><img src="https://raw.githubusercontent.com/3530268799-design/yanqo/main/image-20250928204840800.png" alt="image-20250928204840800">代码解释</p>
+<ul>
+<li><code>tar -czvf</code>是 “打包 + 压缩” 命令：<code>-c</code>创建压缩包，<code>-z</code>用 gzip 压缩（让文件更小），<code>-v</code>显示压缩过程，<code>-f</code>指定压缩包名（这里是<code>log.tar.gz</code>），<code>./</code>表示 “当前目录下所有文件”。</li>
+</ul>
+<p>3.**<code>auth.log.1</code>文件:**这是 SSH 登录日志的 “历史文件”，因为 Linux 会定期滚动日志，旧日志会加<code>.1</code>后缀</p>
+<p>(SSH 登录（包括爆破、成功登录）的所有记录，都会存在<code>auth.log</code>（新日志）或<code>auth.log.1</code>（旧日志）中)</p>
+<p>4.“爆破 root 账号” 的特征是 “多次尝试用 root 账号登录，但密码错误”，日志中会显示<code>Failed password for root</code>（“root 账号密码错误”），只要提取这些日志中的 IP，去重后就是答案。</p>
+<p>命令:<code>cat auth.log.1 | grep -a &quot;Failed password for root&quot;</code></p>
+<p>命令解释</p>
+<ul>
+<li><code>cat auth.log.1</code>：把<code>auth.log.1</code>日志文件的内容 “读出来”（<code>cat</code>是 “查看文件内容” 命令）。</li>
+<li><code>|</code>：管道符，相当于 “把前一个命令的结果传给后一个命令处理”（比如把日志内容传给<code>grep</code>过滤）。</li>
+<li><code>grep -a &quot;Failed password for root&quot;</code>：<code>grep</code>是 “搜索过滤” 命令，<code>-a</code>确保能正常读取日志（避免日志编码问题），<code>&quot;Failed password for root&quot;</code>是 “搜索关键词”—— 只保留包含 “root 账号密码错误” 的日志行。</li>
+</ul>
+<p>5.若IP很多需要去重</p>
+<p>输入命令：<code>cat auth.log.1 | grep -a &quot;Failed password for root&quot; | awk &#39;&#123;print $11&#125;&#39; | uniq -c</code></p>
+<p><img src="https://raw.githubusercontent.com/3530268799-design/yanqo/main/image-20250928205149764.png" alt="image-20250928205149764"></p>
+<p>命令解释</p>
+<ul>
+<li><p><code>awk &#39;&#123;print $11&#125;&#39;</code>：<code>awk</code>是 “提取列” 工具，日志中 IP 在第 11 列（比如第一行日志，<code>192.168.200.32</code>是第 11 个元素），所以用<code>print $11</code>提取 IP。</p>
+</li>
+<li><p><code>uniq -c</code>：<code>uniq</code>是 “去重” 命令，<code>-c</code>表示 “统计每个 IP 出现的次数”（即每个 IP 爆破 root 的次数）。</p>
+<h3 id="所以flag是flag-192-168-200-2-192-168-200-31-192-168-200-32"><a href="#所以flag是flag-192-168-200-2-192-168-200-31-192-168-200-32" class="headerlink" title="所以flag是flag{192.168.200.2,192.168.200.31,192.168.200.32}"></a>所以flag是flag{192.168.200.2,192.168.200.31,192.168.200.32}</h3></li>
+</ul>
+<h1 id="2-SSH-爆破成功登陆的-IP-是多少"><a href="#2-SSH-爆破成功登陆的-IP-是多少" class="headerlink" title="2.SSH 爆破成功登陆的 IP 是多少"></a>2.SSH 爆破成功登陆的 IP 是多少</h1><p>1.“SSH 登录成功” 的日志特征是<code>Accepted password for root</code>（“root 账号密码正确，登录成功”）</p>
+<p>2.提取登录成功的日志</p>
+<p>代码:<code>cat auth.log.1 | grep -a &quot;Accepted &quot;</code></p>
+<p><img src="https://raw.githubusercontent.com/3530268799-design/yanqo/main/image-20250928205338733.png" alt="image-20250928205338733"></p>
+<p>我们看到只有一个IP登录成功</p>
+<h3 id="所以flag就是flag-192-168-200-2"><a href="#所以flag就是flag-192-168-200-2" class="headerlink" title="所以flag就是flag{192.168.200.2}"></a>所以flag就是flag{192.168.200.2}</h3><h1 id="3-爆破用户名字典是什么"><a href="#3-爆破用户名字典是什么" class="headerlink" title="3.爆破用户名字典是什么"></a>3.爆破用户名字典是什么</h1><h3 id="核心逻辑："><a href="#核心逻辑：" class="headerlink" title="核心逻辑："></a>核心逻辑：</h3><p>“爆破用户名字典” 是黑客尝试登录的所有账号（包括存在的账号如 root，和不存在的账号如 test1），日志中 “密码错误” 的记录会显示<code>Failed password for 用户名</code>（比如<code>Failed password for invalid user test1</code>表示 “尝试用不存在的账号 test1 登录，密码错误”），提取这些 “用户名” 去重后就是字典。</p>
+<p>1.<strong>提取所有 “密码错误” 的日志</strong></p>
+<p>输入命令：<code>cat auth.log.1 | grep -a &quot;Failed password&quot;</code></p>
+<p>输出结果中会有以下内容：</p>
+<p>![屏幕截图 2025-09-28 205517](<a target="_blank" rel="noopener" href="https://raw.githubusercontent.com/3530268799-design/yanqo/main/%E5%B1%8F%E5%B9%95%E6%88%AA%E5%9B%BE">https://raw.githubusercontent.com/3530268799-design/yanqo/main/屏幕截图</a> 2025-09-28 205517.png)</p>
+<p>注释:invalid user翻译为不存在的用户invalid user后面的名字就是尝试的用户名</p>
+<p>2.<strong>提取 “用户名”</strong></p>
+<p>输入命令：<code>cat auth.log.1 | grep -a &quot;Failed password&quot; | grep -o &#39;for .* from&#39; | uniq -c</code></p>
+<p><img src="https://raw.githubusercontent.com/3530268799-design/yanqo/main/image-20250928205858935.png" alt="image-20250928205858935"></p>
+<ul>
+<li><p>命令解释：</p>
+<ul>
+<li><p><code>grep -o &#39;for .* from&#39;</code>：<code>-o</code>表示 “只提取匹配的部分”，<code>for .* from</code>是 “从 for 开始，到 from 结束的所有内容”（比如<code>for root from</code>、<code>for invalid user user from</code>），这样就能定位到 “用户名” 所在的片段。</p>
+</li>
+<li><p><code>uniq -c</code>：去重并统计每个用户名被尝试的次数，避免重复的用户名干扰结果。</p>
+<h3 id="由此可知flag就是flag-user-hello-root-test3-test2-test1"><a href="#由此可知flag就是flag-user-hello-root-test3-test2-test1" class="headerlink" title="由此可知flag就是flag{user,hello,root,test3,test2,test1}"></a>由此可知flag就是flag{user,hello,root,test3,test2,test1}</h3><p>但是写到这里我就有个疑问了,为什么我按图片里的名字排序提交flag是错的,必须要按照这个顺序,事后查阅资料可知flag按照sort排序了,所以我们将代码改为</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cat</span> auth.log.1 | grep -a <span class="string">&quot;Failed password&quot;</span> | grep -o <span class="string">&#x27;for .* from&#x27;</span> | <span class="built_in">uniq</span> -c | <span class="built_in">sort</span> -nr</span><br></pre></td></tr></table></figure></li>
+</ul>
+</li>
+</ul>
+<p><img src="https://raw.githubusercontent.com/3530268799-design/yanqo/main/image-20250928210423114.png" alt="image-20250928210423114"></p>
+<p>命令解释补充:</p>
+<p>sort -nr 的作用，说明 - n 是按数字排序，-r 是倒序，这样结果会从次数最多到最少排列。</p>
+<h1 id="4-登陆成功的-IP-共爆破了多少次"><a href="#4-登陆成功的-IP-共爆破了多少次" class="headerlink" title="4.登陆成功的 IP 共爆破了多少次"></a>4.登陆成功的 IP 共爆破了多少次</h1><h3 id="核心逻辑：-1"><a href="#核心逻辑：-1" class="headerlink" title="核心逻辑："></a>核心逻辑：</h3><h5 id="“登录成功的-IP”-是问题-2-中找到的192-168-200-2，“爆破次数”-是这个-IP-尝试登录root账号的总失败次数（因为爆破是-“多次尝试”，直到成功，所以失败次数就是爆破次数）。"><a href="#“登录成功的-IP”-是问题-2-中找到的192-168-200-2，“爆破次数”-是这个-IP-尝试登录root账号的总失败次数（因为爆破是-“多次尝试”，直到成功，所以失败次数就是爆破次数）。" class="headerlink" title="“登录成功的 IP” 是问题 2 中找到的192.168.200.2，“爆破次数” 是这个 IP 尝试登录root账号的总失败次数（因为爆破是 “多次尝试”，直到成功，所以失败次数就是爆破次数）。"></a>“登录成功的 IP” 是问题 2 中找到的<code>192.168.200.2</code>，“爆破次数” 是这个 IP 尝试登录<code>root</code>账号的总失败次数（因为爆破是 “多次尝试”，直到成功，所以失败次数就是爆破次数）。</h5><p><strong>提取 “192.168.200.2 尝试登录 root” 的所有日志</strong></p>
+<p>输入命令：<code>cat auth.log.1 | grep -a &quot;192.168.200.2&quot; | grep &quot;for root&quot;</code></p>
+<p><img src="https://raw.githubusercontent.com/3530268799-design/yanqo/main/image-20250928210627016.png" alt="image-20250928210627016"></p>
+<ul>
+<li><p>命令解释：</p>
+<ul>
+<li><p><code>grep -a &quot;192.168.200.2&quot;</code>：先过滤出这个 IP 的所有日志。</p>
+</li>
+<li><p>再用<code>grep &quot;for root&quot;</code>：过滤出这个 IP 尝试登录<code>root</code>账号的日志（因为爆破的是 root 账号）。</p>
+<p>从图片中可以看到,登录失败(Failed password )总共有4次</p>
+<h3 id="所以flag就是flag-4"><a href="#所以flag就是flag-4" class="headerlink" title="所以flag就是flag{4}"></a>所以flag就是flag{4}</h3></li>
+</ul>
+</li>
+</ul>
+<h1 id="5-黑客登陆主机后新建了一个后门用户，用户名是多少"><a href="#5-黑客登陆主机后新建了一个后门用户，用户名是多少" class="headerlink" title="5.黑客登陆主机后新建了一个后门用户，用户名是多少"></a>5.黑客登陆主机后新建了一个后门用户，用户名是多少</h1><h3 id="核心逻辑：-2"><a href="#核心逻辑：-2" class="headerlink" title="核心逻辑："></a>核心逻辑：</h3><p>“新建用户” 在 Linux 中会通过<code>useradd</code>命令执行，日志中会显示<code>new user: name=用户名</code>（“新建用户，名字是 XXX”）；同时，Linux 所有用户信息都存在<code>/etc/passwd</code>文件中，也能直接查看。</p>
+<h3 id="详细步骤："><a href="#详细步骤：" class="headerlink" title="详细步骤："></a>详细步骤：</h3><p>方法1:</p>
+<p>从日志中找 “新建用户” 记录</p>
+<p>输入命令：<code>cat auth.log.1 | grep -a &quot;new user&quot;</code>，按回车。</p>
+<p><img src="https://raw.githubusercontent.com/3530268799-design/yanqo/main/image-20250928210842553.png" alt="image-20250928210842553"></p>
+<ul>
+<li><p>命令解释：<code>new user</code>是 “新建用户” 的日志关键词，直接过滤就能找到黑客新建的用户（<code>name=test2</code>）。</p>
+<p>可以看到有两条new user,查阅资料可知</p>
+<p>日志中若有类似 <code>uid=1001</code>、<code>home=/home/debian</code>、<code>shell=/bin/bash</code>，则基本可以确定是普通用户。</p>
+<h3 id="所以flag就是flag-test2"><a href="#所以flag就是flag-test2" class="headerlink" title="所以flag就是flag{test2}"></a>所以flag就是flag{test2}</h3></li>
+</ul>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://example.com">扬祺</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://example.com/2025/10/01/Linux%E6%97%A5%E5%BF%97%E5%88%86%E6%9E%90/">http://example.com/2025/10/01/Linux%E6%97%A5%E5%BF%97%E5%88%86%E6%9E%90/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://example.com" target="_blank">Q1yl</a>！</span></div></div><div class="tag_share"><div class="post-share"><div class="social-share" data-image="/img/bz.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2025/10/01/webshell%E6%9F%A5%E6%9D%80/" title="webshell查杀"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">webshell查杀</div></div><div class="info-2"><div class="info-item-1">前置知识：核心概念解释 Webshell：黑客上传到服务器的恶意脚本文件（如.php&#x2F;.jsp&#x2F;.asp），可通过浏览器或工具远程控制服务器（执行命令、窃取数据等），是网站被入侵的核心证据。 免杀 Webshell：经过特殊处理（如代码加密、混淆、伪装），能绕过杀毒软件 &#x2F; 安全扫描工具检测的 Webshell，更难被发现。 D 盾：一款专业的 Webshell 查杀工具，通过 “特征码匹配”“行为分析” 检测恶意脚本，是应急响应中常用的工具。 MD5：一种哈希算法，可将任意长度的文本 &#x2F; 文件转换为 32 位（或 16 位）的固定字符串，常用于 “验证文件唯一性”（同一文件 MD5 固定，修改后会变化）。 隐藏文件：Linux 系统中，文件名以 “.” 开头的文件默认隐藏（用ls命令看不到，需用ls -a查看），黑客常用来隐藏 Webshell 躲避排查。  一、任务 1：获取 Webshell 中的 flag（flag {xxxx-xxxx-xxxx-xxxx-xxxx}）步骤 1：备份服务器文件（tar -czvf html.tar....</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/bz.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">扬祺</div><div class="author-info-description"></div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">2</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">0</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">This is my Blog</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#1-%E6%9C%89%E5%A4%9A%E5%B0%91-IP-%E5%9C%A8%E7%88%86%E7%A0%B4%E4%B8%BB%E6%9C%BA-SSH-%E7%9A%84-root-%E5%B8%90%E5%8F%B7"><span class="toc-number">1.</span> <span class="toc-text">1.有多少 IP 在爆破主机 SSH 的 root 帐号</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%89%80%E4%BB%A5flag%E6%98%AFflag-192-168-200-2-192-168-200-31-192-168-200-32"><span class="toc-number">1.0.1.</span> <span class="toc-text">所以flag是flag{192.168.200.2,192.168.200.31,192.168.200.32}</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#2-SSH-%E7%88%86%E7%A0%B4%E6%88%90%E5%8A%9F%E7%99%BB%E9%99%86%E7%9A%84-IP-%E6%98%AF%E5%A4%9A%E5%B0%91"><span class="toc-number">2.</span> <span class="toc-text">2.SSH 爆破成功登陆的 IP 是多少</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%89%80%E4%BB%A5flag%E5%B0%B1%E6%98%AFflag-192-168-200-2"><span class="toc-number">2.0.1.</span> <span class="toc-text">所以flag就是flag{192.168.200.2}</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#3-%E7%88%86%E7%A0%B4%E7%94%A8%E6%88%B7%E5%90%8D%E5%AD%97%E5%85%B8%E6%98%AF%E4%BB%80%E4%B9%88"><span class="toc-number">3.</span> <span class="toc-text">3.爆破用户名字典是什么</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E9%80%BB%E8%BE%91%EF%BC%9A"><span class="toc-number">3.0.1.</span> <span class="toc-text">核心逻辑：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%B1%E6%AD%A4%E5%8F%AF%E7%9F%A5flag%E5%B0%B1%E6%98%AFflag-user-hello-root-test3-test2-test1"><span class="toc-number">3.0.2.</span> <span class="toc-text">由此可知flag就是flag{user,hello,root,test3,test2,test1}</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#4-%E7%99%BB%E9%99%86%E6%88%90%E5%8A%9F%E7%9A%84-IP-%E5%85%B1%E7%88%86%E7%A0%B4%E4%BA%86%E5%A4%9A%E5%B0%91%E6%AC%A1"><span class="toc-number">4.</span> <span class="toc-text">4.登陆成功的 IP 共爆破了多少次</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E9%80%BB%E8%BE%91%EF%BC%9A-1"><span class="toc-number">4.0.1.</span> <span class="toc-text">核心逻辑：</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E2%80%9C%E7%99%BB%E5%BD%95%E6%88%90%E5%8A%9F%E7%9A%84-IP%E2%80%9D-%E6%98%AF%E9%97%AE%E9%A2%98-2-%E4%B8%AD%E6%89%BE%E5%88%B0%E7%9A%84192-168-200-2%EF%BC%8C%E2%80%9C%E7%88%86%E7%A0%B4%E6%AC%A1%E6%95%B0%E2%80%9D-%E6%98%AF%E8%BF%99%E4%B8%AA-IP-%E5%B0%9D%E8%AF%95%E7%99%BB%E5%BD%95root%E8%B4%A6%E5%8F%B7%E7%9A%84%E6%80%BB%E5%A4%B1%E8%B4%A5%E6%AC%A1%E6%95%B0%EF%BC%88%E5%9B%A0%E4%B8%BA%E7%88%86%E7%A0%B4%E6%98%AF-%E2%80%9C%E5%A4%9A%E6%AC%A1%E5%B0%9D%E8%AF%95%E2%80%9D%EF%BC%8C%E7%9B%B4%E5%88%B0%E6%88%90%E5%8A%9F%EF%BC%8C%E6%89%80%E4%BB%A5%E5%A4%B1%E8%B4%A5%E6%AC%A1%E6%95%B0%E5%B0%B1%E6%98%AF%E7%88%86%E7%A0%B4%E6%AC%A1%E6%95%B0%EF%BC%89%E3%80%82"><span class="toc-number">4.0.1.0.1.</span> <span class="toc-text">“登录成功的 IP” 是问题 2 中找到的192.168.200.2，“爆破次数” 是这个 IP 尝试登录root账号的总失败次数（因为爆破是 “多次尝试”，直到成功，所以失败次数就是爆破次数）。</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%89%80%E4%BB%A5flag%E5%B0%B1%E6%98%AFflag-4"><span class="toc-number">4.0.2.</span> <span class="toc-text">所以flag就是flag{4}</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#5-%E9%BB%91%E5%AE%A2%E7%99%BB%E9%99%86%E4%B8%BB%E6%9C%BA%E5%90%8E%E6%96%B0%E5%BB%BA%E4%BA%86%E4%B8%80%E4%B8%AA%E5%90%8E%E9%97%A8%E7%94%A8%E6%88%B7%EF%BC%8C%E7%94%A8%E6%88%B7%E5%90%8D%E6%98%AF%E5%A4%9A%E5%B0%91"><span class="toc-number">5.</span> <span class="toc-text">5.黑客登陆主机后新建了一个后门用户，用户名是多少</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E9%80%BB%E8%BE%91%EF%BC%9A-2"><span class="toc-number">5.0.1.</span> <span class="toc-text">核心逻辑：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AF%A6%E7%BB%86%E6%AD%A5%E9%AA%A4%EF%BC%9A"><span class="toc-number">5.0.2.</span> <span class="toc-text">详细步骤：</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%89%80%E4%BB%A5flag%E5%B0%B1%E6%98%AFflag-test2"><span class="toc-number">5.0.3.</span> <span class="toc-text">所以flag就是flag{test2}</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/10/01/Linux%E6%97%A5%E5%BF%97%E5%88%86%E6%9E%90/" title="Linux日志分析">Linux日志分析</a><time datetime="2025-09-30T23:36:35.000Z" title="发表于 2025-10-01 07:36:35">2025-10-01</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/10/01/webshell%E6%9F%A5%E6%9D%80/" title="webshell查杀">webshell查杀</a><time datetime="2025-09-30T23:33:26.000Z" title="发表于 2025-10-01 07:33:26">2025-10-01</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 By 扬祺</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.0</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
