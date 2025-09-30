@@ -1,0 +1,27 @@
+/* 导航栏卡其色（无任何干扰） */
+#navbar.navbar {
+  background-color: rgba(238, 222, 204, 0.4) !important;
+  backdrop-filter: blur(6px) !important;
+  border-bottom: 1px solid rgba(238, 222, 204, 0.6) !important;
+}
+
+#navbar.navbar.scroll {
+  background-color: rgba(238, 222, 204, 0.6) !important;
+}
+
+/* 导航菜单文字 */
+#navbar .menus_item a {
+  color: #5a4a38 !important;
+}
+
+#navbar .menus_item a:hover {
+  color: #3d2f1f !important;
+}
+
+/* 背景图保持清晰 */
+body {
+  background-image: url('/img/bj.jpg') !important;
+  background-size: cover;
+  background-attachment: fixed;
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
