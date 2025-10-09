@@ -1,0 +1,271 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Windows实战-evtx文件分析 | Q1yl</title><meta name="author" content="扬祺"><meta name="copyright" content="扬祺"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="步骤 1：找黑客成功登录的 IP 地址（Flag：登录 IP）先看安全日志 为什么看Security.evtx（安全日志）？ 因为 Windows 会把 “用户登录 / 注销” 这类涉及安全的操作，专门记录在安全日志里（这是系统默认的审计规则）。 为什么用「事件 ID 4624」？ “事件 ID” 是 Windows 给每种操作的 “编号”——事件 ID 4624 = 成功的账">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Windows实战-evtx文件分析">
+<meta property="og:url" content="http://example.com/2025/10/09/Windows%E5%AE%9E%E6%88%98-evtx%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90/index.html">
+<meta property="og:site_name" content="Q1yl">
+<meta property="og:description" content="步骤 1：找黑客成功登录的 IP 地址（Flag：登录 IP）先看安全日志 为什么看Security.evtx（安全日志）？ 因为 Windows 会把 “用户登录 / 注销” 这类涉及安全的操作，专门记录在安全日志里（这是系统默认的审计规则）。 为什么用「事件 ID 4624」？ “事件 ID” 是 Windows 给每种操作的 “编号”——事件 ID 4624 = 成功的账">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/bz.jpg">
+<meta property="article:published_time" content="2025-10-09T10:32:35.000Z">
+<meta property="article:modified_time" content="2025-10-09T10:42:04.899Z">
+<meta property="article:author" content="扬祺">
+<meta property="article:tag" content="Windows">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/bz.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Windows实战-evtx文件分析",
+  "url": "http://example.com/2025/10/09/Windows%E5%AE%9E%E6%88%98-evtx%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90/",
+  "image": "http://example.com/img/bz.jpg",
+  "datePublished": "2025-10-09T10:32:35.000Z",
+  "dateModified": "2025-10-09T10:42:04.899Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "扬祺",
+      "url": "http://example.com"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/2025/10/09/Windows%E5%AE%9E%E6%88%98-evtx%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"><link rel="preconnect" href="//busuanzi.ibruce.info"><meta><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Windows实战-evtx文件分析',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="/css/custom.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.css"><link rel="stylesheet" href="/css/modify.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-image: url(/img/bj.jpg);"></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background: transparent;"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Q1yl</span></a><a class="nav-page-title" href="/"><span class="site-name">Windows实战-evtx文件分析</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"></div></nav><div id="post-info"><h1 class="post-title">Windows实战-evtx文件分析</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-10-09T10:32:35.000Z" title="发表于 2025-10-09 18:32:35">2025-10-09</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-10-09T10:42:04.899Z" title="更新于 2025-10-09 18:42:04">2025-10-09</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h2 id="步骤-1：找黑客成功登录的-IP-地址（Flag：登录-IP）"><a href="#步骤-1：找黑客成功登录的-IP-地址（Flag：登录-IP）" class="headerlink" title="步骤 1：找黑客成功登录的 IP 地址（Flag：登录 IP）"></a>步骤 1：找黑客成功登录的 IP 地址（Flag：登录 IP）</h2><p>先看安全日志</p>
+<p>为什么看Security.evtx（安全日志）？</p>
+<p>因为 Windows 会把 “用户登录 / 注销” 这类涉及安全的操作，专门记录在安全日志里（这是系统默认的审计规则）。</p>
+<p>为什么用「事件 ID 4624」？</p>
+<p>“事件 ID” 是 Windows 给每种操作的 “编号”——事件 ID 4624 = 成功的账户登录(对应的，事件 ID 4625 就是 “登录失败”）。要找 “成功登录”，就筛选这个 ID。</p>
+<h3 id="操作流程-日志"><a href="#操作流程-日志" class="headerlink" title="操作流程 &amp; 日志"></a>操作流程 &amp; 日志</h3><h4 id="（1）操作步骤"><a href="#（1）操作步骤" class="headerlink" title="（1）操作步骤"></a>（1）操作步骤</h4><ol>
+<li><p>打开「Security.evtx」；</p>
+</li>
+<li><p>筛选 “事件 ID 4624”（只看成功登录的记录）；</p>
+<p><img src="https://raw.githubusercontent.com/3530268799-design/yanqo/main/image-20251009171417331.png" alt="image-20251009171417331"></p>
+</li>
+<li><p>按 “时间排序”（从新到旧或旧到新,找到可疑IP）；</p>
+</li>
+<li><p>看日志里的 “网络信息”，找到「源网络地址」（就是黑客的 IP）。</p>
+<p><img src="https://raw.githubusercontent.com/3530268799-design/yanqo/main/image-20251009171546148.png" alt="image-20251009171546148"></p>
+</li>
+</ol>
+<h4 id="（2）关键日志片段解释"><a href="#（2）关键日志片段解释" class="headerlink" title="（2）关键日志片段解释"></a>（2）关键日志片段解释</h4><figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"># 日志里的“网络信息”部分</span><br><span class="line">常规；</span><br><span class="line">网络信息:</span><br><span class="line">工作站名:	WIN-B1B1T3K57G9  # 黑客登录的目标服务器名称（被攻击的服务器）</span><br><span class="line">源网络地址:	192.168.36.133  # 这是黑客的IP地址（登录来源）</span><br><span class="line">源端口:	53971</span><br></pre></td></tr></tbody></table></figure>
+
+<p>「工作站名」：是被攻击的服务器名称，不是黑客的；</p>
+<p>「源网络地址」：字面意思 “来源的网络地址”，就是黑客电脑的 IP，这就是我们要的关键信息；</p>
+<p>「源端口」：黑客电脑上随机分配的端口，解题用不上，但知道是 “登录连接的端口” 即可。</p>
+<h3 id="4-最终-Flag"><a href="#4-最终-Flag" class="headerlink" title="4. 最终 Flag"></a>4. 最终 Flag</h3><h5 id="黑客登录-IP-是192-168-36-133，所以-Flag：flag-192-168-36-133"><a href="#黑客登录-IP-是192-168-36-133，所以-Flag：flag-192-168-36-133" class="headerlink" title="黑客登录 IP 是192.168.36.133，所以 Flag：flag{192.168.36.133}"></a>黑客登录 IP 是<code>192.168.36.133</code>，所以 Flag：<code>flag{192.168.36.133}</code></h5><h2 id="步骤-2：找黑客修改后的用户名（Flag：新用户名）"><a href="#步骤-2：找黑客修改后的用户名（Flag：新用户名）" class="headerlink" title="步骤 2：找黑客修改后的用户名（Flag：新用户名）"></a>步骤 2：找黑客修改后的用户名（Flag：新用户名）</h2><p>账户修改（改用户名、改密码、禁用账户等）属于 “安全审计事件”，依然记录在安全日志(Security.evtx)里。</p>
+<p>事件 ID 4738 = 用户账户被修改（比如改用户名、改显示名、改邮箱等），这个 ID 会明确记录 “被修改的账户是谁”“修改前是什么值”“修改后是什么值”。</p>
+<h4 id="（1）操作步骤-1"><a href="#（1）操作步骤-1" class="headerlink" title="（1）操作步骤"></a>（1）操作步骤</h4><ol>
+<li>还是在Security.evtx里；</li>
+<li>筛选 “事件 ID 4738”（只看账户修改记录）；<img src="https://raw.githubusercontent.com/3530268799-design/yanqo/main/image-20251009172105410.png" alt="image-20251009172105410"></li>
+<li>看日志里的「TargetUserName」（被修改的账户名）和「SamAccountName」（Windows 账户的 “短名”，核心标识）。</li>
+</ol>
+<h4 id="（2）"><a href="#（2）" class="headerlink" title="（2）"></a>（2）</h4><p>日志里有两个核心字段需要区分：</p>
+<p><code>SubjectUserName</code>：<strong>执行修改操作的人</strong>（比如 “谁改了用户名”），这里显示为<code>WIN-B1B1T3K57G9$</code>（带<code>$</code>的是系统 / 计算机账户，说明是黑客通过系统权限改的）；</p>
+<p><code>TargetUserName</code>    <code>SamAccountName</code>：<strong>被修改的账户名</strong>（也就是我们要的 “修改后的用户名”），这两个字段都显示为<code>Adnimistartro</code>（注意不是默认的<code>Administrator</code>，多了个<code>r</code>，是黑客改的）。</p>
+<p>为什么这两个字段能确定？<code>SamAccountName</code>是 Windows 账户的 “唯一短名”（比如默认管理员是<code>Administrator</code>），一旦修改，这个字段会直接显示新值；<code>TargetUserName</code>是 “目标账户名”，和<code>SamAccountName</code>一致，就说明这是修改后的最终用户名。</p>
+<p>修改的日志不多,一个个尝试即可,最后发现最可疑的就是Adnimistartro,与默认管理员Administrator相似</p>
+<p><img src="https://raw.githubusercontent.com/3530268799-design/yanqo/main/image-20251009172508050.png" alt="image-20251009172508050"></p>
+<h3 id="4-最终-Flag-1"><a href="#4-最终-Flag-1" class="headerlink" title="4. 最终 Flag"></a>4. 最终 Flag</h3><p>修改后的用户名为<code>Adnimistartro</code>，所以 Flag：<code>flag{Adnimistartro}</code></p>
+<h2 id="步骤-3：找黑客访问的关键文件名（Flag：文件名，无后缀）"><a href="#步骤-3：找黑客访问的关键文件名（Flag：文件名，无后缀）" class="headerlink" title="步骤 3：找黑客访问的关键文件名（Flag：文件名，无后缀）"></a>步骤 3：找黑客访问的关键文件名（Flag：文件名，无后缀）</h2><p>还是看Security.evtx</p>
+<p>“访问系统关键文件” 属于 “对象访问审计事件”，安全日志会记录这类高权限操作（前提是系统开启了文件审计，但靶场里已经开启，所以有记录）。</p>
+<p>事件 ID 4663 = 尝试访问对象（文件 / 文件夹 / 注册表等），这个 ID 会明确记录 “谁访问了哪个文件”“用什么进程访问的”“有没有权限”。</p>
+<h4 id="（1）操作步骤-2"><a href="#（1）操作步骤-2" class="headerlink" title="（1）操作步骤"></a>（1）操作步骤</h4><ol>
+<li><p>Security.evtx中筛选 “事件 ID 4663”；</p>
+</li>
+<li><p>看日志里的ObjectType(对象类型)是否为<code>File</code>（确保是文件，不是文件夹或注册表）；</p>
+</li>
+<li><p>看ObjectName（文件路径），找 “系统关键路径” 下的文件（比如<code>C:\Windows\System32\</code>下的文件，普通用户不会随便访问）；</p>
+</li>
+<li><p>日志看着很多其实大多是重复的,一个个尝试特别是system路径下的,最后发现是SCHEMA.DAT(用户名是administrator是因为黑客先查看文件后改动的用户名,可以查看对应时间就知道)</p>
+<p><img src="https://raw.githubusercontent.com/3530268799-design/yanqo/main/image-20251009173132614.png" alt="image-20251009173132614"></p>
+</li>
+<li><p>提取文件名（不含后缀）。</p>
+<p>事后查询一下为什么是它</p>
+</li>
+</ol>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"># 本题的事件ID 4663日志核心内容</span><br><span class="line">EventData </span><br><span class="line">  SubjectUserSid S-1-5-21-xxx  # 访问者的SID（对应管理员账户）</span><br><span class="line">  SubjectUserName administrator  # 访问者是管理员（黑客用的高权限账户）</span><br><span class="line">  ObjectType File  # 访问的是“文件”（不是文件夹）</span><br><span class="line">  ObjectName C:\Windows\System32\SMI\Store\Machine\SCHEMA.DAT  # 关键文件路径</span><br><span class="line">  ProcessName C:\Windows\explorer.exe  # 用“文件管理器”访问的（手动操作，不是程序自动访问）</span><br></pre></td></tr></tbody></table></figure>
+
+<p><code>SubjectUserName: administrator</code>：说明是高权限账户访问（黑客控制了管理员账户）；</p>
+<p><code>ObjectName</code>：文件路径是<code>C:\Windows\System32\...</code>（System32 是系统核心目录，里面的文件很关键），文件名是<code>SCHEMA.DAT</code>；</p>
+<p><code>ProcessName: explorer.exe</code>：是 Windows 的 “文件管理器”，说明黑客手动打开了这个文件（不是系统自动访问，更可疑）。</p>
+<p><code>SCHEMA.DAT</code>是 Windows 的 “系统架构配置文件”，记录系统组件的配置信息，普通用户几乎不会访问，只有高权限操作（比如黑客篡改系统配置）才会动它，所以是 “关键文件”。</p>
+<h3 id="4-最终-Flag-2"><a href="#4-最终-Flag-2" class="headerlink" title="4. 最终 Flag"></a>4. 最终 Flag</h3><p>文件名是<code>SCHEMA.DAT</code>，不含后缀就是<code>SCHEMA</code>，所以 Flag：<code>flag{SCHEMA}</code></p>
+<h2 id="步骤-4：找最后一次重启数据库的进程-ID（Flag：进程-ID）"><a href="#步骤-4：找最后一次重启数据库的进程-ID（Flag：进程-ID）" class="headerlink" title="步骤 4：找最后一次重启数据库的进程 ID（Flag：进程 ID）"></a>步骤 4：找最后一次重启数据库的进程 ID（Flag：进程 ID）</h2><p>MySQL 是 “应用程序 / 服务”，它的启动、停止、报错等事件，会记录在应用日志里（系统日志只记录操作系统自身的服务，比如 Windows Update，不记录 MySQL）。</p>
+<p>不同应用的事件 ID 是自己定义的，对于 MySQL 来说，</p>
+<p>事件 ID 100 = MySQL 服务启动</p>
+<p>（重启本质是 “停止 + 启动”，所以找启动事件就能拿到重启后的进程 ID）。</p>
+<h4 id="（1）操作步骤-3"><a href="#（1）操作步骤-3" class="headerlink" title="（1）操作步骤"></a>（1）操作步骤</h4><ol>
+<li><p>打开Application.evtx；</p>
+</li>
+<li><p>筛选 “事件 ID 100” 且 “事件来源（Provider）为 MySQL”；</p>
+</li>
+<li><p>按时间排序，找 “最后一次” 的启动事件；(通过之前的题目可知黑客在日期10.8攻击,所以时间跨度太大的就不看比如12月份的,通过查看EventData中的Data排除其他的日志,找第一个符合要求的即可)</p>
+<p><img src="https://raw.githubusercontent.com/3530268799-design/yanqo/main/image-20251009174601811.png" alt="image-20251009174601811"></p>
+</li>
+<li><p>从日志中提取 “进程 ID”（<code>starting as process 8820</code>）。</p>
+</li>
+</ol>
+<h4 id="（2）关键-XML-日志片段解释（靶场用-XML-视图查看）"><a href="#（2）关键-XML-日志片段解释（靶场用-XML-视图查看）" class="headerlink" title="（2）关键 XML 日志片段解释（靶场用 XML 视图查看）"></a>（2）关键 XML 日志片段解释（靶场用 XML 视图查看）</h4><figure class="highlight xml"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">Event</span> <span class="attr">xmlns</span>=<span class="string">"http://schemas.microsoft.com/win/2004/08/events/event"</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- 系统级信息：事件来源、ID、时间等 --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">System</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Provider</span> <span class="attr">Name</span>=<span class="string">"MySQL"</span> /&gt;</span>  <span class="comment">&lt;!-- 事件来源：MySQL服务（确定是数据库的事件） --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">EventID</span> <span class="attr">Qualifiers</span>=<span class="string">"49152"</span>&gt;</span>100<span class="tag">&lt;/<span class="name">EventID</span>&gt;</span>  <span class="comment">&lt;!-- MySQL的启动事件ID --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">TimeCreated</span> <span class="attr">SystemTime</span>=<span class="string">"2020-10-08T07:53:09.0000000Z"</span> /&gt;</span>  <span class="comment">&lt;!-- 启动时间（最后一次） --&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Channel</span>&gt;</span>Application<span class="tag">&lt;/<span class="name">Channel</span>&gt;</span>  <span class="comment">&lt;!-- 日志类别：应用日志（确认没找错日志） --&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">System</span>&gt;</span></span><br><span class="line">  <span class="comment">&lt;!-- 具体事件内容：MySQL启动的详细信息 --&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">EventData</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">Data</span>&gt;</span>.phpcustom_mysql (mysqld 5.5.62-log) starting as process 8820 ...<span class="tag">&lt;/<span class="name">Data</span>&gt;</span></span><br><span class="line">    <span class="comment">&lt;!-- 关键内容：“starting as process 8820” → 启动为进程ID 8820 --&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">EventData</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">Event</span>&gt;</span></span><br></pre></td></tr></tbody></table></figure>
+
+<ul>
+<li><code>Provider Name="MySQL"</code>：确保这个事件是 MySQL 产生的，不是其他应用；</li>
+<li><code>TimeCreated</code>：按时间排序后，这个时间是 “最后一次” 启动，所以对应的进程 ID 是最后一次的；</li>
+<li><code>EventData</code>中的<code>Data</code>：直接写了 “starting as process 8820”，翻译过来就是 “以进程 ID 8820 启动”—— 这就是我们要的进程 ID。</li>
+</ul>
+<h3 id="4-最终-Flag-3"><a href="#4-最终-Flag-3" class="headerlink" title="4. 最终 Flag"></a>4. 最终 Flag</h3><p>最后一次重启 MySQL 的进程 ID 是<code>8820</code>，所以 Flag：<code>flag{8820}</code></p>
+<h2 id="步骤-5：找修改后用户重启系统的次数（Flag：次数）"><a href="#步骤-5：找修改后用户重启系统的次数（Flag：次数）" class="headerlink" title="步骤 5：找修改后用户重启系统的次数（Flag：次数）"></a>步骤 5：找修改后用户重启系统的次数（Flag：次数）</h2><p>黑客修改用户名（步骤 2 的<code>Adnimistartro</code>）后，多次重启系统，需要统计<strong>用这个修改后用户名重启的次数</strong>。</p>
+<p>系统的 “启动 / 重启 / 关机” 是操作系统核心操作，记录在系统日志里（应用日志不记录这个）。</p>
+<p>系统重启分两种：</p>
+<p>系统自动重启（比如更新后）：用事件 ID 6005/6006（日志服务启动 / 停止，间接表示系统启动 / 关机）；</p>
+<p><strong>用户 / 进程手动触发的重启 / 关机</strong>：用事件 ID 1074，这个 ID 会明确记录 “谁触发的重启”（用户名），所以必须用 1074 才能关联到 “修改后的用户名”。</p>
+<h3 id="3-操作流程"><a href="#3-操作流程" class="headerlink" title="3. 操作流程"></a>3. 操作流程</h3><h4 id="（1）操作步骤-4"><a href="#（1）操作步骤-4" class="headerlink" title="（1）操作步骤"></a>（1）操作步骤</h4><ol>
+<li>打开System.evtx；</li>
+<li>筛选 “事件 ID 1074”；</li>
+<li>排除 “关机”“关闭电源”（只留 “重启” 操作）；</li>
+<li>排除 “用 Administrator（原用户名）”“用 SYSTEM（系统账户）” 触发的重启；</li>
+<li>统计 “用 Adnimistartro（修改后用户名）” 触发的重启次数。</li>
+</ol>
+<h4 id="（2）关键筛选逻辑"><a href="#（2）关键筛选逻辑" class="headerlink" title="（2）关键筛选逻辑"></a>（2）关键筛选逻辑</h4><p>第一步：区分 “重启” 和 “关机”事件 ID 1074 的描述里会写 “操作类型”，比如：</p>
+<p>“关机”“关闭电源”：不算，题目要的是 “重启”；</p>
+<p>“重新启动”：算，保留这类记录。</p>
+<p>第二步：区分 “修改前用户” 和 “修改后用户”日志里会有「User Name」字段（触发重启的用户名）：</p>
+<p>若为<code>Administrator</code>（原管理员名）：不算（还没修改用户名）；</p>
+<p>若为<code>SYSTEM</code>（系统账户）：不算（不是黑客手动操作）；</p>
+<p>若为<code>Adnimistartro</code>（修改后用户名）：算，统计次数。</p>
+<h4 id="（3）靶场实际统计结果"><a href="#（3）靶场实际统计结果" class="headerlink" title="（3）靶场实际统计结果"></a>（3）靶场实际统计结果</h4><p>靶场里筛选后，符合 “修改后用户（Adnimistartro）+ 重启” 的记录共<strong>3 次</strong>（排除了关机、关闭电源、用原用户名 / SYSTEM 的重启）。</p>
+<p>也可以不用筛选,日志不多,一个个查看即可</p>
+<p><img src="https://raw.githubusercontent.com/3530268799-design/yanqo/main/image-20251009175838004.png" alt="image-20251009175838004"></p>
+<p>这里有一个小细节,我们单查看日志用户名发现只有两次,但是看时间</p>
+<p><img src="https://raw.githubusercontent.com/3530268799-design/yanqo/main/image-20251009180321266.png" alt="image-20251009180321266"></p>
+<p>黑客在14.07就已经掌控了主机,所以这个system的重新启动也是黑客的通过系统程序重新启动的,加上后面两次一共三次<img src="https://raw.githubusercontent.com/3530268799-design/yanqo/main/image-20251009180512757.png" alt="image-20251009180512757"></p>
+<h3 id="4-最终-Flag-4"><a href="#4-最终-Flag-4" class="headerlink" title="4. 最终 Flag"></a>4. 最终 Flag</h3><p>重启次数是<code>3</code>，所以 Flag：<code>flag{3}</code></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://example.com">扬祺</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://example.com/2025/10/09/Windows%E5%AE%9E%E6%88%98-evtx%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90/">http://example.com/2025/10/09/Windows%E5%AE%9E%E6%88%98-evtx%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://example.com" target="_blank">Q1yl</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Windows/">Windows</a></div><div class="post-share"><div class="social-share" data-image="/img/bz.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer=""></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2025/10/01/Linux%E6%97%A5%E5%BF%97%E5%88%86%E6%9E%90/" title="Linux日志分析"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">Linux日志分析</div></div><div class="info-2"><div class="info-item-1">1.有多少 IP 在爆破主机 SSH 的 root 帐号1./var/log是 Linux 默认日志目录，比如 SSH 登录日志、系统操作日志都存在这里，是分析的核心素材。 1cd /var/log   2.输入命令tar -czvf log.tar.gz ./ 代码解释  tar -czvf是 “打包 + 压缩” 命令：-c创建压缩包，-z用 gzip 压缩（让文件更小），-v显示压缩过程，-f指定压缩包名（这里是log.tar.gz），./表示 “当前目录下所有文件”。  3.**auth.log.1文件:**这是 SSH 登录日志的 “历史文件”，因为 Linux 会定期滚动日志，旧日志会加.1后缀 (SSH 登录（包括爆破、成功登录）的所有记录，都会存在auth.log（新日志）或auth.log.1（旧日志）中) 4.“爆破 root 账号” 的特征是 “多次尝试用 root 账号登录，但密码错误”，日志中会显示Failed password for root（“root 账号密码错误”），只要提取这些日志中的 IP，去重后就是答案。 命令:cat auth.log.1...</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/bz.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"></div><div class="author-info-name">扬祺</div><div class="author-info-description"></div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">3</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">1</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">V:lyq3035762968</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4-1%EF%BC%9A%E6%89%BE%E9%BB%91%E5%AE%A2%E6%88%90%E5%8A%9F%E7%99%BB%E5%BD%95%E7%9A%84-IP-%E5%9C%B0%E5%9D%80%EF%BC%88Flag%EF%BC%9A%E7%99%BB%E5%BD%95-IP%EF%BC%89"><span class="toc-number">1.</span> <span class="toc-text">步骤 1：找黑客成功登录的 IP 地址（Flag：登录 IP）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%93%8D%E4%BD%9C%E6%B5%81%E7%A8%8B-%E6%97%A5%E5%BF%97"><span class="toc-number">1.1.</span> <span class="toc-text">操作流程 &amp; 日志</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%EF%BC%881%EF%BC%89%E6%93%8D%E4%BD%9C%E6%AD%A5%E9%AA%A4"><span class="toc-number">1.1.1.</span> <span class="toc-text">（1）操作步骤</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%EF%BC%882%EF%BC%89%E5%85%B3%E9%94%AE%E6%97%A5%E5%BF%97%E7%89%87%E6%AE%B5%E8%A7%A3%E9%87%8A"><span class="toc-number">1.1.2.</span> <span class="toc-text">（2）关键日志片段解释</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E6%9C%80%E7%BB%88-Flag"><span class="toc-number">1.2.</span> <span class="toc-text">4. 最终 Flag</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E9%BB%91%E5%AE%A2%E7%99%BB%E5%BD%95-IP-%E6%98%AF192-168-36-133%EF%BC%8C%E6%89%80%E4%BB%A5-Flag%EF%BC%9Aflag-192-168-36-133"><span class="toc-number">1.2.0.1.</span> <span class="toc-text">黑客登录 IP 是192.168.36.133，所以 Flag：flag{192.168.36.133}</span></a></li></ol></li></ol></li></ol><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4-2%EF%BC%9A%E6%89%BE%E9%BB%91%E5%AE%A2%E4%BF%AE%E6%94%B9%E5%90%8E%E7%9A%84%E7%94%A8%E6%88%B7%E5%90%8D%EF%BC%88Flag%EF%BC%9A%E6%96%B0%E7%94%A8%E6%88%B7%E5%90%8D%EF%BC%89"><span class="toc-number">2.</span> <span class="toc-text">步骤 2：找黑客修改后的用户名（Flag：新用户名）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%EF%BC%881%EF%BC%89%E6%93%8D%E4%BD%9C%E6%AD%A5%E9%AA%A4-1"><span class="toc-number">2.0.1.</span> <span class="toc-text">（1）操作步骤</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%EF%BC%882%EF%BC%89"><span class="toc-number">2.0.2.</span> <span class="toc-text">（2）</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E6%9C%80%E7%BB%88-Flag-1"><span class="toc-number">2.1.</span> <span class="toc-text">4. 最终 Flag</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4-3%EF%BC%9A%E6%89%BE%E9%BB%91%E5%AE%A2%E8%AE%BF%E9%97%AE%E7%9A%84%E5%85%B3%E9%94%AE%E6%96%87%E4%BB%B6%E5%90%8D%EF%BC%88Flag%EF%BC%9A%E6%96%87%E4%BB%B6%E5%90%8D%EF%BC%8C%E6%97%A0%E5%90%8E%E7%BC%80%EF%BC%89"><span class="toc-number">3.</span> <span class="toc-text">步骤 3：找黑客访问的关键文件名（Flag：文件名，无后缀）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%EF%BC%881%EF%BC%89%E6%93%8D%E4%BD%9C%E6%AD%A5%E9%AA%A4-2"><span class="toc-number">3.0.1.</span> <span class="toc-text">（1）操作步骤</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E6%9C%80%E7%BB%88-Flag-2"><span class="toc-number">3.1.</span> <span class="toc-text">4. 最终 Flag</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4-4%EF%BC%9A%E6%89%BE%E6%9C%80%E5%90%8E%E4%B8%80%E6%AC%A1%E9%87%8D%E5%90%AF%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E8%BF%9B%E7%A8%8B-ID%EF%BC%88Flag%EF%BC%9A%E8%BF%9B%E7%A8%8B-ID%EF%BC%89"><span class="toc-number">4.</span> <span class="toc-text">步骤 4：找最后一次重启数据库的进程 ID（Flag：进程 ID）</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%EF%BC%881%EF%BC%89%E6%93%8D%E4%BD%9C%E6%AD%A5%E9%AA%A4-3"><span class="toc-number">4.0.1.</span> <span class="toc-text">（1）操作步骤</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%EF%BC%882%EF%BC%89%E5%85%B3%E9%94%AE-XML-%E6%97%A5%E5%BF%97%E7%89%87%E6%AE%B5%E8%A7%A3%E9%87%8A%EF%BC%88%E9%9D%B6%E5%9C%BA%E7%94%A8-XML-%E8%A7%86%E5%9B%BE%E6%9F%A5%E7%9C%8B%EF%BC%89"><span class="toc-number">4.0.2.</span> <span class="toc-text">（2）关键 XML 日志片段解释（靶场用 XML 视图查看）</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E6%9C%80%E7%BB%88-Flag-3"><span class="toc-number">4.1.</span> <span class="toc-text">4. 最终 Flag</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4-5%EF%BC%9A%E6%89%BE%E4%BF%AE%E6%94%B9%E5%90%8E%E7%94%A8%E6%88%B7%E9%87%8D%E5%90%AF%E7%B3%BB%E7%BB%9F%E7%9A%84%E6%AC%A1%E6%95%B0%EF%BC%88Flag%EF%BC%9A%E6%AC%A1%E6%95%B0%EF%BC%89"><span class="toc-number">5.</span> <span class="toc-text">步骤 5：找修改后用户重启系统的次数（Flag：次数）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E6%93%8D%E4%BD%9C%E6%B5%81%E7%A8%8B"><span class="toc-number">5.1.</span> <span class="toc-text">3. 操作流程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%EF%BC%881%EF%BC%89%E6%93%8D%E4%BD%9C%E6%AD%A5%E9%AA%A4-4"><span class="toc-number">5.1.1.</span> <span class="toc-text">（1）操作步骤</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%EF%BC%882%EF%BC%89%E5%85%B3%E9%94%AE%E7%AD%9B%E9%80%89%E9%80%BB%E8%BE%91"><span class="toc-number">5.1.2.</span> <span class="toc-text">（2）关键筛选逻辑</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%EF%BC%883%EF%BC%89%E9%9D%B6%E5%9C%BA%E5%AE%9E%E9%99%85%E7%BB%9F%E8%AE%A1%E7%BB%93%E6%9E%9C"><span class="toc-number">5.1.3.</span> <span class="toc-text">（3）靶场实际统计结果</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#4-%E6%9C%80%E7%BB%88-Flag-4"><span class="toc-number">5.2.</span> <span class="toc-text">4. 最终 Flag</span></a></li></ol></li></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/10/09/Windows%E5%AE%9E%E6%88%98-evtx%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90/" title="Windows实战-evtx文件分析">Windows实战-evtx文件分析</a><time datetime="2025-10-09T10:32:35.000Z" title="发表于 2025-10-09 18:32:35">2025-10-09</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/10/01/Linux%E6%97%A5%E5%BF%97%E5%88%86%E6%9E%90/" title="Linux日志分析">Linux日志分析</a><time datetime="2025-09-30T23:36:35.000Z" title="发表于 2025-10-01 07:36:35">2025-10-01</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/10/01/webshell%E6%9F%A5%E6%9D%80/" title="webshell查杀">webshell查杀</a><time datetime="2025-09-30T23:33:26.000Z" title="发表于 2025-10-01 07:33:26">2025-10-01</time></div></div></div></div></div></div></main><footer id="footer" style="background: transparent;"><div class="footer-other"><div class="footer-copyright"><span class="copyright">©&nbsp;2025 By 扬祺</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.0</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"></div><script src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.js"></script><script async="" data-pjax="" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
