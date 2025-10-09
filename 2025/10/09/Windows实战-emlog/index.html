@@ -1,0 +1,446 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Windows实战-emlog | Q1yl</title><meta name="author" content="扬祺"><meta name="copyright" content="扬祺"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="一、任务 1：找到黑客植入的 Shell 并获取密码（FLAG：rebeyond）核心目标定位黑客上传的 Web 后门（Shell），读取其连接密码。Web 后门（如冰蝎 Shell）是黑客控制服务器的常用工具，通常需密码验证才能连接。 步骤 1：通过 RDP 连接目标服务器 操作步骤 ：  在本地 PC 打开「远程桌面连接」（快捷键：Win+R，输入mstsc回车）。 输入目标服务器的 IP 地">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Windows实战-emlog">
+<meta property="og:url" content="http://example.com/2025/10/09/Windows%E5%AE%9E%E6%88%98-emlog/index.html">
+<meta property="og:site_name" content="Q1yl">
+<meta property="og:description" content="一、任务 1：找到黑客植入的 Shell 并获取密码（FLAG：rebeyond）核心目标定位黑客上传的 Web 后门（Shell），读取其连接密码。Web 后门（如冰蝎 Shell）是黑客控制服务器的常用工具，通常需密码验证才能连接。 步骤 1：通过 RDP 连接目标服务器 操作步骤 ：  在本地 PC 打开「远程桌面连接」（快捷键：Win+R，输入mstsc回车）。 输入目标服务器的 IP 地">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/bz.jpg">
+<meta property="article:published_time" content="2025-10-09T10:50:41.000Z">
+<meta property="article:modified_time" content="2025-10-09T10:53:28.583Z">
+<meta property="article:author" content="扬祺">
+<meta property="article:tag" content="Windows">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/bz.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Windows实战-emlog",
+  "url": "http://example.com/2025/10/09/Windows%E5%AE%9E%E6%88%98-emlog/",
+  "image": "http://example.com/img/bz.jpg",
+  "datePublished": "2025-10-09T10:50:41.000Z",
+  "dateModified": "2025-10-09T10:53:28.583Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "扬祺",
+      "url": "http://example.com"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/2025/10/09/Windows%E5%AE%9E%E6%88%98-emlog/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"><link rel="preconnect" href="//busuanzi.ibruce.info"><meta><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Windows实战-emlog',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="/css/custom.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.css"><link rel="stylesheet" href="/css/modify.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-image: url(/img/bj.jpg);"></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background: transparent;"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Q1yl</span></a><a class="nav-page-title" href="/"><span class="site-name">Windows实战-emlog</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"></div></nav><div id="post-info"><h1 class="post-title">Windows实战-emlog</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-10-09T10:50:41.000Z" title="发表于 2025-10-09 18:50:41">2025-10-09</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-10-09T10:53:28.583Z" title="更新于 2025-10-09 18:53:28">2025-10-09</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h2 id="一、任务-1：找到黑客植入的-Shell-并获取密码（FLAG：rebeyond）"><a href="#一、任务-1：找到黑客植入的-Shell-并获取密码（FLAG：rebeyond）" class="headerlink" title="一、任务 1：找到黑客植入的 Shell 并获取密码（FLAG：rebeyond）"></a>一、任务 1：找到黑客植入的 Shell 并获取密码（FLAG：rebeyond）</h2><h3 id="核心目标"><a href="#核心目标" class="headerlink" title="核心目标"></a>核心目标</h3><p>定位黑客上传的 Web 后门（Shell），读取其连接密码。Web 后门（如冰蝎 Shell）是黑客控制服务器的常用工具，通常需密码验证才能连接。</p>
+<h4 id="步骤-1：通过-RDP-连接目标服务器"><a href="#步骤-1：通过-RDP-连接目标服务器" class="headerlink" title="步骤 1：通过 RDP 连接目标服务器"></a>步骤 1：通过 RDP 连接目标服务器</h4><ol>
+<li><p>操作步骤</p>
+<p>：</p>
+<ul>
+<li>在本地 PC 打开「远程桌面连接」（快捷键：Win+R，输入<code>mstsc</code>回车）。</li>
+<li>输入目标服务器的 IP 地址（如<code>192.168.1.100</code>，靶场会提供）、登录账号（如管理员账号<code>Administrator</code>）和密码，点击 “连接”。</li>
+</ul>
+</li>
+<li><p>操作理由</p>
+<p>：</p>
+<ul>
+<li>RDP（远程桌面协议）是 Windows 系统默认的远程管理工具，只有先连接服务器，才能查看其文件和日志。</li>
+</ul>
+</li>
+<li><p>原理解析</p>
+<p>：</p>
+<ul>
+<li>RDP 通过 TCP 端口 3389 传输数据，允许本地 PC 直接操控服务器桌面，就像操作自己的电脑一样，是运维和溯源的基础入口。</li>
+</ul>
+</li>
+</ol>
+<h4 id="步骤-2：进入-phpstudy-目录，找到-access-log-日志文件"><a href="#步骤-2：进入-phpstudy-目录，找到-access-log-日志文件" class="headerlink" title="步骤 2：进入 phpstudy 目录，找到 access.log 日志文件"></a>步骤 2：进入 phpstudy 目录，找到 access.log 日志文件</h4><ol>
+<li><p>操作步骤</p>
+<p>：</p>
+<ul>
+<li>服务器桌面通常有<code>phpstudy</code>图标（或在安装目录，默认路径：<code>D:\phpstudy</code>或<code>C:\phpstudy</code>）。</li>
+<li>打开 phpstudy 文件夹，依次进入<code>Apache</code>（或 Nginx，取决于 Web 服务器）→ <code>logs</code>目录，找到<code>access.log</code>文件（Web 访问日志，记录所有访问服务器的请求）。</li>
+</ul>
+</li>
+<li><p>操作理由</p>
+<p>：</p>
+<ul>
+<li><code>phpstudy</code>是常用的 PHP 环境集成工具，黑客若上传 PHP 类型的 Shell（如冰蝎 Shell），必然会通过 Web 访问该 Shell 文件，访问记录会保存在<code>access.log</code>中。</li>
+</ul>
+</li>
+<li><p>原理解析</p>
+<p>：</p>
+<ul>
+<li>Web 服务器（如 Apache）会将每一次 HTTP 请求（包括访问的 URL、客户端 IP、访问时间等）写入<code>access.log</code>，这是溯源 “黑客访问路径” 的关键日志。</li>
+</ul>
+</li>
+</ol>
+<h4 id="步骤-3：分析-access-log，定位黑客的-Shell-路径"><a href="#步骤-3：分析-access-log，定位黑客的-Shell-路径" class="headerlink" title="步骤 3：分析 access.log，定位黑客的 Shell 路径"></a>步骤 3：分析 access.log，定位黑客的 Shell 路径</h4><ol>
+<li><p>操作步骤</p>
+<p>：</p>
+<ul>
+<li><p>用记事本或 Notepad++ 打开<code>access.log</code>，按<code>Ctrl+F</code>搜索关键词（如<code>shell.php</code>、<code>backdoor.php</code>，黑客常用的 Shell 文件名）。</p>
+</li>
+<li><p>找到类似如下的日志记录（示例）：</p>
+<p>plaintext</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">192.168.126.1 - - [10/Oct/2024:14:30:00 +0800] "POST /upload/shell.php HTTP/1.1" 200 123</span><br></pre></td></tr></tbody></table></figure>
+
+
+
+<ul>
+<li>其中<code>/upload/shell.php</code>就是黑客访问的 Shell 路径，对应的文件在服务器的<code>phpstudy</code>网站根目录（默认：<code>D:\phpstudy\WWW</code>）下，即<code>D:\phpstudy\WWW\upload\shell.php</code>。</li>
+</ul>
+</li>
+</ul>
+</li>
+<li><p>操作理由</p>
+<p>：</p>
+<ul>
+<li>黑客要使用 Shell，必须通过 HTTP 请求（如 POST）访问 Shell 文件，日志中的<code>POST</code>方法 + 不常见的 PHP 文件路径，大概率是黑客的 Shell。</li>
+</ul>
+</li>
+<li><p>原理解析</p>
+<p>：</p>
+<ul>
+<li>日志格式说明：<code>客户端IP - 用户名 [访问时间] "请求方法 访问路径 协议版本" 状态码 字节数</code>。</li>
+<li>状态码<code>200</code>表示请求成功，说明黑客成功访问了该 Shell 文件，路径<code>/upload/shell.php</code>就是 Shell 的位置。</li>
+</ul>
+</li>
+</ol>
+<h4 id="步骤-4：打开-Shell-文件，获取默认密码-“rebeyond”"><a href="#步骤-4：打开-Shell-文件，获取默认密码-“rebeyond”" class="headerlink" title="步骤 4：打开 Shell 文件，获取默认密码 “rebeyond”"></a>步骤 4：打开 Shell 文件，获取默认密码 “rebeyond”</h4><ol>
+<li><p>操作步骤</p>
+<p>：</p>
+<ul>
+<li>按日志中的路径找到<code>shell.php</code>文件（如<code>D:\phpstudy\WWW\upload\shell.php</code>），用记事本打开。</li>
+<li>搜索关键词（如<code>$password</code>、<code>rebeyond</code>），通常冰蝎默认 Shell 的密码会明文或加密存储在代码中，此处直接找到密码为<code>rebeyond</code>。</li>
+</ul>
+</li>
+<li><p>操作理由</p>
+<p>：</p>
+<ul>
+<li>冰蝎（Behinder）是主流的 Web 后门工具，其默认生成的 Shell 密码为<code>rebeyond</code>，黑客若未修改默认密码，直接读取即可获取。</li>
+</ul>
+</li>
+<li><p>原理解析</p>
+<p>：</p>
+<ul>
+<li>冰蝎 Shell 的核心是 “密码验证 + 命令执行”，代码中会定义一个密码变量（如<code>$pass = 'rebeyond';</code>），只有客户端输入正确密码，才能建立连接并执行黑客的命令。</li>
+</ul>
+</li>
+</ol>
+<h4 id="任务-1-结果"><a href="#任务-1-结果" class="headerlink" title="任务 1 结果"></a>任务 1 结果</h4><p>FLAG 为<code>flag{rebeyond}</code></p>
+<h2 id="二、任务-2：分析黑客攻击成功的-IP（FLAG：192-168-126-1）"><a href="#二、任务-2：分析黑客攻击成功的-IP（FLAG：192-168-126-1）" class="headerlink" title="二、任务 2：分析黑客攻击成功的 IP（FLAG：192.168.126.1）"></a>二、任务 2：分析黑客攻击成功的 IP（FLAG：192.168.126.1）</h2><h3 id="核心目标-1"><a href="#核心目标-1" class="headerlink" title="核心目标"></a>核心目标</h3><p>从 Web 访问日志中提取黑客的客户端 IP（即发起攻击的 IP）。</p>
+<h4 id="步骤-1：复用任务-1-的-access-log-日志"><a href="#步骤-1：复用任务-1-的-access-log-日志" class="headerlink" title="步骤 1：复用任务 1 的 access.log 日志"></a>步骤 1：复用任务 1 的 access.log 日志</h4><ol>
+<li><p>操作步骤</p>
+<p>：</p>
+<ul>
+<li><p>回到任务 1 中打开的access.log文件，找到访问 Shell 文件（如shell.php）的日志记录（示例）：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">192.168.126.1 - - [10/Oct/2024:14:30:00 +0800] "POST /upload/shell.php HTTP/1.1" 200 123</span><br></pre></td></tr></tbody></table></figure>
+</li>
+<li><p>日志中第一个 IP 地址（<code>192.168.126.1</code>）就是黑客的客户端 IP。</p>
+</li>
+</ul>
+</li>
+<li><p>操作理由</p>
+<p>：</p>
+<ul>
+<li><code>access.log</code>中 “请求来源 IP” 字段（日志最开头）记录了发起访问的设备 IP，黑客通过该 IP 访问 Shell，因此该 IP 就是攻击 IP。</li>
+</ul>
+</li>
+<li><p>原理解析</p>
+<p>：</p>
+<ul>
+<li>所有 HTTP 请求都会携带客户端的 IP 地址（除非用代理隐藏），Web 服务器会将该 IP 记录在日志中，这是定位攻击源的最直接证据。</li>
+</ul>
+</li>
+</ol>
+<h4 id="任务-2-结果"><a href="#任务-2-结果" class="headerlink" title="任务 2 结果"></a>任务 2 结果</h4><p>FLAG 为<code>flag{192.168.126.1}</code></p>
+<h2 id="三、任务-3：找到黑客创建的隐藏账户（FLAG：hacker138）"><a href="#三、任务-3：找到黑客创建的隐藏账户（FLAG：hacker138）" class="headerlink" title="三、任务 3：找到黑客创建的隐藏账户（FLAG：hacker138）"></a>三、任务 3：找到黑客创建的隐藏账户（FLAG：hacker138）</h2><h3 id="核心目标-2"><a href="#核心目标-2" class="headerlink" title="核心目标"></a>核心目标</h3><p>排查服务器中黑客创建的隐藏账户（通常带<code>$</code>符号或特殊权限，用于长期控制服务器）。</p>
+<h4 id="步骤-1：通过-“控制面板”-查看用户账户"><a href="#步骤-1：通过-“控制面板”-查看用户账户" class="headerlink" title="步骤 1：通过 “控制面板” 查看用户账户"></a>步骤 1：通过 “控制面板” 查看用户账户</h4><ol>
+<li><p>操作步骤</p>
+<p>：</p>
+<ul>
+<li>在服务器桌面，右键点击「此电脑」→ 「管理」（或直接打开「控制面板」→ 「用户账户」→ 「管理账户」）。</li>
+<li>进入「计算机管理」窗口，左侧展开「本地用户和组」→ 「用户」，查看所有用户账户。</li>
+<li>找到名称带<code>$</code>（Windows 默认隐藏账户标识）或名称异常的账户（如<code>hacker138</code>，非系统默认账户）。</li>
+</ul>
+</li>
+<li><p>操作理由</p>
+<p>：</p>
+<ul>
+<li>黑客入侵后，常创建隐藏账户（添加<code>$</code>符号可让账户在 “控制面板 - 用户账户” 中默认不显示），用于后续远程登录（如通过 RDP 或远程命令）。</li>
+</ul>
+</li>
+<li><p>原理解析</p>
+<p>：</p>
+<ul>
+<li>Windows 系统中，账户名称后加<code>$</code>符号会被标记为 “隐藏账户”，普通用户在桌面看不到，但通过「计算机管理」可强制显示；黑客创建此类账户是为了躲避常规检查，长期驻留服务器。</li>
+</ul>
+</li>
+</ol>
+<h4 id="步骤-2：确认隐藏账户身份"><a href="#步骤-2：确认隐藏账户身份" class="headerlink" title="步骤 2：确认隐藏账户身份"></a>步骤 2：确认隐藏账户身份</h4><ol>
+<li><p>操作步骤</p>
+<p>：</p>
+<ul>
+<li>右键点击异常账户（如<code>hacker138</code>）→ 「属性」，查看是否有 “管理员权限”（如加入<code>Administrators</code>组），若有则大概率是黑客账户。</li>
+</ul>
+</li>
+<li><p>操作理由</p>
+<p>：</p>
+<ul>
+<li>黑客创建的隐藏账户通常会赋予自己管理员权限，以便修改服务器配置、上传文件等，因此 “异常名称 + 管理员权限” 是判断黑客账户的核心依据。</li>
+</ul>
+</li>
+</ol>
+<h4 id="任务-3-结果"><a href="#任务-3-结果" class="headerlink" title="任务 3 结果"></a>任务 3 结果</h4><p>FLAG 为<code>flag{hacker138}</code></p>
+<h2 id="四、任务-4：分析黑客挖矿程序的矿池域名（FLAG：wakuang-zhigongshanfang-top）"><a href="#四、任务-4：分析黑客挖矿程序的矿池域名（FLAG：wakuang-zhigongshanfang-top）" class="headerlink" title="四、任务 4：分析黑客挖矿程序的矿池域名（FLAG：wakuang.zhigongshanfang.top）"></a>四、任务 4：分析黑客挖矿程序的矿池域名（FLAG：wakuang.zhigongshanfang.top）</h2><h3 id="核心目标-3"><a href="#核心目标-3" class="headerlink" title="核心目标"></a>核心目标</h3><p>定位黑客上传的挖矿程序，反编译后提取其连接的矿池域名（挖矿程序需连接矿池才能提交算力，获取收益）。</p>
+<h4 id="步骤-1：找到黑客账户下的挖矿程序（Kuang-exe）"><a href="#步骤-1：找到黑客账户下的挖矿程序（Kuang-exe）" class="headerlink" title="步骤 1：找到黑客账户下的挖矿程序（Kuang.exe）"></a>步骤 1：找到黑客账户下的挖矿程序（Kuang.exe）</h4><ol>
+<li><p>操作步骤</p>
+<p>：</p>
+<ul>
+<li>进入黑客隐藏账户（<code>hacker138</code>）的桌面目录（默认路径：<code>C:\Users\hacker138\Desktop</code>）。</li>
+<li>找到名称异常的可执行文件（如<code>Kuang.exe</code>，“矿” 的拼音缩写，大概率是挖矿程序）。</li>
+</ul>
+</li>
+<li><p>操作理由</p>
+<p>：</p>
+<ul>
+<li>黑客通常会将挖矿程序放在自己创建的账户目录下（避免被管理员发现），且文件名常含 “矿”“mine” 等关键词，方便自己管理。</li>
+</ul>
+</li>
+<li><p>原理解析</p>
+<p>：</p>
+<ul>
+<li>挖矿程序是消耗服务器 CPU/GPU 算力的恶意程序，黑客需将其放在可执行目录（如桌面），并通过账户权限运行，因此在黑客账户桌面找挖矿程序是最高效的方式。</li>
+</ul>
+</li>
+</ol>
+<h4 id="步骤-2：用-pyinstxtractor-py-解包-Python-打包的-Kuang-exe"><a href="#步骤-2：用-pyinstxtractor-py-解包-Python-打包的-Kuang-exe" class="headerlink" title="步骤 2：用 pyinstxtractor.py 解包 Python 打包的 Kuang.exe"></a>步骤 2：用 pyinstxtractor.py 解包 Python 打包的 Kuang.exe</h4><ol>
+<li><p><strong>背景说明</strong>：</p>
+<ul>
+<li><code>Kuang.exe</code>是用<code>PyInstaller</code>（Python 打包工具）将 Python 脚本打包成的可执行文件，直接打开无法查看源码，需先 “解包” 提取出内部的 Python 字节码文件（<code>.pyc</code>）。</li>
+<li><code>pyinstxtractor.py</code>是专门用于解包<code>PyInstaller</code>打包文件的 Python 脚本，需提前在服务器上准备（可从网上下载后复制到服务器）。</li>
+</ul>
+</li>
+<li><p><strong>操作步骤</strong>：</p>
+<ul>
+<li><p>在服务器上安装 Python 环境（若未安装，从 Python 官网下载并安装，勾选 “Add Python to PATH”）。</p>
+</li>
+<li><p>将<code>pyinstxtractor.py</code>和<code>Kuang.exe</code>放在同一文件夹（如<code>D:\mine_analysis</code>）。</p>
+</li>
+<li><p>打开 “命令提示符”（Win+R，输入</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cmd</span><br></pre></td></tr></tbody></table></figure>
+
+<p>回车），切换到该文件夹：</p>
+<p>cmd</p>
+<figure class="highlight cmd"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> D:\mine_analysis</span><br></pre></td></tr></tbody></table></figure>
+
+
+</li>
+<li><p>执行解包命令：</p>
+<p>cmd</p>
+<figure class="highlight cmd"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python pyinstxtractor.py Kuang.exe</span><br></pre></td></tr></tbody></table></figure>
+
+
+</li>
+<li><p>解包完成后，会生成一个<code>Kuang.exe_extracted</code>文件夹，进入该文件夹，找到<code>Kuang.pyc</code>文件（Python 字节码文件，对应原挖矿脚本）。</p>
+</li>
+</ul>
+</li>
+<li><p><strong>操作理由</strong>：</p>
+<ul>
+<li><code>PyInstaller</code>打包的<code>exe</code>文件本质是 “Python 解释器 + 脚本字节码 + 依赖库” 的压缩包，<code>pyinstxtractor.py</code>可拆解该压缩包，提取出核心的<code>.pyc</code>字节码文件，为后续反编译做准备。</li>
+</ul>
+</li>
+<li><p><strong>原理解析</strong>：</p>
+<ul>
+<li><code>.pyc</code>文件是 Python 脚本编译后的字节码（非机器码），无法直接阅读，但可通过反编译工具还原为近似原代码的 Python 脚本，从而获取挖矿程序的配置（如矿池地址）。</li>
+</ul>
+</li>
+</ol>
+<h4 id="步骤-3：用-uncompyle6-反编译-Kuang-pyc，提取矿池域名"><a href="#步骤-3：用-uncompyle6-反编译-Kuang-pyc，提取矿池域名" class="headerlink" title="步骤 3：用 uncompyle6 反编译 Kuang.pyc，提取矿池域名"></a>步骤 3：用 uncompyle6 反编译 Kuang.pyc，提取矿池域名</h4><ol>
+<li><p><strong>背景说明</strong>：</p>
+<ul>
+<li><code>uncompyle6</code>是 Python 字节码反编译工具，可将<code>.pyc</code>文件还原为可读的<code>.py</code>文件，需通过<code>pip</code>安装。</li>
+</ul>
+</li>
+<li><p><strong>操作步骤</strong>：</p>
+<ul>
+<li><p>在命令提示符中，安装</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">uncompyle6</span><br></pre></td></tr></tbody></table></figure>
+
+<p>：</p>
+<p>cmd</p>
+<figure class="highlight cmd"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pip install uncompyle6</span><br></pre></td></tr></tbody></table></figure>
+
+
+</li>
+<li><p>进入</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Kuang.exe_extracted</span><br></pre></td></tr></tbody></table></figure>
+
+<p>文件夹，执行反编译命令：</p>
+<p>cmd</p>
+<figure class="highlight cmd"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">uncompyle6 Kuang.pyc &gt; Kuang.py</span><br></pre></td></tr></tbody></table></figure>
+
+
+</li>
+<li><p>此时会生成<code>Kuang.py</code>文件（可读的 Python 源码），用记事本打开该文件。</p>
+</li>
+<li><p>搜索关键词（如</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">pool</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mine</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">domain</span><br></pre></td></tr></tbody></table></figure>
+
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">http</span><br></pre></td></tr></tbody></table></figure>
+
+<p>），找到矿池域名配置，示例代码：</p>
+<p>python</p>
+<p>运行</p>
+<figure class="highlight python"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">mine_pool = <span class="string">"stratum+tcp://wakuang.zhigongshanfang.top:3333"</span></span><br></pre></td></tr></tbody></table></figure>
+</li>
+<li><p>提取其中的域名部分（仅保留域名，去掉协议和端口）：<code>wakuang.zhigongshanfang.top</code>。</p>
+</li>
+</ul>
+</li>
+<li><p><strong>操作理由</strong>：</p>
+<ul>
+<li>挖矿程序必须配置 “矿池地址”（域名或 IP），才能将计算出的 “哈希值” 提交给矿池，矿池再根据算力分配收益，因此源码中必然包含矿池域名。</li>
+</ul>
+</li>
+<li><p><strong>原理解析</strong>：</p>
+<ul>
+<li>矿池是挖矿的 “算力集中管理平台”，所有挖矿设备需连接矿池才能参与挖矿，黑客的挖矿程序会在代码中硬编码矿池地址（避免被轻易修改），反编译后即可直接读取。</li>
+</ul>
+</li>
+</ol>
+<h4 id="任务-4-结果"><a href="#任务-4-结果" class="headerlink" title="任务 4 结果"></a>任务 4 结果</h4><p>FLAG 为<code>flag{wakuang.zhigongshanfang.top}</code></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://example.com">扬祺</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://example.com/2025/10/09/Windows%E5%AE%9E%E6%88%98-emlog/">http://example.com/2025/10/09/Windows%E5%AE%9E%E6%88%98-emlog/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://example.com" target="_blank">Q1yl</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/Windows/">Windows</a></div><div class="post-share"><div class="social-share" data-image="/img/bz.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer=""></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related full-width" href="/2025/10/09/blueteam%E7%9A%84%E5%B0%8F%E5%BF%83%E6%80%9D/" title="blueteam的小心思"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">blueteam的小心思</div></div><div class="info-2"><div class="info-item-1">问题 1：找登录密码并算 MD5目标：从流量包中挖出登录密码，再算它的 MD5 值步骤 1：用终端找流量包（PCAP 文件） 打开终端， 复制粘贴 下面的命令（不用手动输，避免输错），然后按回车： bash 1find / -name *.pcap 2&gt;/dev/null    等待几秒，终端会输出类似这样的结果（找到 PCAP 文件路径）： plaintext 1/home/ubuntu/attack.pcap  # 这是示例路径，你的可能不一样    记住这个路径（比如 /home/ubuntu/attack.pcap），后面要用。   步骤 2：用 Wireshark 打开流量包找密码 打开 Wireshark，点击左上角 “文件”→“打开”，在弹出的窗口里，找到步骤 1 记的路径（比如 /home/ubuntu/attack.pcap），选中文件后点 “打开”。  此时 Wireshark 会显示很多杂乱的流量，我们需要筛选 “登录请求”：  在 Wireshark 顶部的 “过滤器” 输入框里，复制粘贴 http.request.method == POST，然后...</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2025/10/09/Windows%E5%AE%9E%E6%88%98-evtx%E6%96%87%E4%BB%B6%E5%88%86%E6%9E%90/" title="Windows实战-evtx文件分析"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-10-09</div><div class="info-item-2">Windows实战-evtx文件分析</div></div><div class="info-2"><div class="info-item-1">步骤 1：找黑客成功登录的 IP 地址（Flag：登录 IP）先看安全日志 为什么看Security.evtx（安全日志）？ 因为 Windows 会把 “用户登录 / 注销” 这类涉及安全的操作，专门记录在安全日志里（这是系统默认的审计规则）。 为什么用「事件 ID 4624」？ “事件 ID” 是 Windows 给每种操作的 “编号”——事件 ID 4624 = 成功的账户登录(对应的，事件 ID 4625 就是 “登录失败”）。要找 “成功登录”，就筛选这个 ID。 操作流程 &amp; 日志（1）操作步骤 打开「Security.evtx」；  筛选 “事件 ID 4624”（只看成功登录的记录）；   按 “时间排序”（从新到旧或旧到新,找到可疑IP）；  看日志里的 “网络信息”，找到「源网络地址」（就是黑客的 IP）。    （2）关键日志片段解释123456# 日志里的“网络信息”部分常规；网络信息:工作站名:	WIN-B1B1T3K57G9  # 黑客登录的目标服务器名称（被攻击的服务器）源网络地址:	192.168.36.133  # 这...</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/bz.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"></div><div class="author-info-name">扬祺</div><div class="author-info-description"></div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">8</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">2</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">V:lyq3035762968</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E4%BB%BB%E5%8A%A1-1%EF%BC%9A%E6%89%BE%E5%88%B0%E9%BB%91%E5%AE%A2%E6%A4%8D%E5%85%A5%E7%9A%84-Shell-%E5%B9%B6%E8%8E%B7%E5%8F%96%E5%AF%86%E7%A0%81%EF%BC%88FLAG%EF%BC%9Arebeyond%EF%BC%89"><span class="toc-number">1.</span> <span class="toc-text">一、任务 1：找到黑客植入的 Shell 并获取密码（FLAG：rebeyond）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E7%9B%AE%E6%A0%87"><span class="toc-number">1.1.</span> <span class="toc-text">核心目标</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4-1%EF%BC%9A%E9%80%9A%E8%BF%87-RDP-%E8%BF%9E%E6%8E%A5%E7%9B%AE%E6%A0%87%E6%9C%8D%E5%8A%A1%E5%99%A8"><span class="toc-number">1.1.1.</span> <span class="toc-text">步骤 1：通过 RDP 连接目标服务器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4-2%EF%BC%9A%E8%BF%9B%E5%85%A5-phpstudy-%E7%9B%AE%E5%BD%95%EF%BC%8C%E6%89%BE%E5%88%B0-access-log-%E6%97%A5%E5%BF%97%E6%96%87%E4%BB%B6"><span class="toc-number">1.1.2.</span> <span class="toc-text">步骤 2：进入 phpstudy 目录，找到 access.log 日志文件</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4-3%EF%BC%9A%E5%88%86%E6%9E%90-access-log%EF%BC%8C%E5%AE%9A%E4%BD%8D%E9%BB%91%E5%AE%A2%E7%9A%84-Shell-%E8%B7%AF%E5%BE%84"><span class="toc-number">1.1.3.</span> <span class="toc-text">步骤 3：分析 access.log，定位黑客的 Shell 路径</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4-4%EF%BC%9A%E6%89%93%E5%BC%80-Shell-%E6%96%87%E4%BB%B6%EF%BC%8C%E8%8E%B7%E5%8F%96%E9%BB%98%E8%AE%A4%E5%AF%86%E7%A0%81-%E2%80%9Crebeyond%E2%80%9D"><span class="toc-number">1.1.4.</span> <span class="toc-text">步骤 4：打开 Shell 文件，获取默认密码 “rebeyond”</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BB%BB%E5%8A%A1-1-%E7%BB%93%E6%9E%9C"><span class="toc-number">1.1.5.</span> <span class="toc-text">任务 1 结果</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E4%BB%BB%E5%8A%A1-2%EF%BC%9A%E5%88%86%E6%9E%90%E9%BB%91%E5%AE%A2%E6%94%BB%E5%87%BB%E6%88%90%E5%8A%9F%E7%9A%84-IP%EF%BC%88FLAG%EF%BC%9A192-168-126-1%EF%BC%89"><span class="toc-number">2.</span> <span class="toc-text">二、任务 2：分析黑客攻击成功的 IP（FLAG：192.168.126.1）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E7%9B%AE%E6%A0%87-1"><span class="toc-number">2.1.</span> <span class="toc-text">核心目标</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4-1%EF%BC%9A%E5%A4%8D%E7%94%A8%E4%BB%BB%E5%8A%A1-1-%E7%9A%84-access-log-%E6%97%A5%E5%BF%97"><span class="toc-number">2.1.1.</span> <span class="toc-text">步骤 1：复用任务 1 的 access.log 日志</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BB%BB%E5%8A%A1-2-%E7%BB%93%E6%9E%9C"><span class="toc-number">2.1.2.</span> <span class="toc-text">任务 2 结果</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E4%BB%BB%E5%8A%A1-3%EF%BC%9A%E6%89%BE%E5%88%B0%E9%BB%91%E5%AE%A2%E5%88%9B%E5%BB%BA%E7%9A%84%E9%9A%90%E8%97%8F%E8%B4%A6%E6%88%B7%EF%BC%88FLAG%EF%BC%9Ahacker138%EF%BC%89"><span class="toc-number">3.</span> <span class="toc-text">三、任务 3：找到黑客创建的隐藏账户（FLAG：hacker138）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E7%9B%AE%E6%A0%87-2"><span class="toc-number">3.1.</span> <span class="toc-text">核心目标</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4-1%EF%BC%9A%E9%80%9A%E8%BF%87-%E2%80%9C%E6%8E%A7%E5%88%B6%E9%9D%A2%E6%9D%BF%E2%80%9D-%E6%9F%A5%E7%9C%8B%E7%94%A8%E6%88%B7%E8%B4%A6%E6%88%B7"><span class="toc-number">3.1.1.</span> <span class="toc-text">步骤 1：通过 “控制面板” 查看用户账户</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4-2%EF%BC%9A%E7%A1%AE%E8%AE%A4%E9%9A%90%E8%97%8F%E8%B4%A6%E6%88%B7%E8%BA%AB%E4%BB%BD"><span class="toc-number">3.1.2.</span> <span class="toc-text">步骤 2：确认隐藏账户身份</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BB%BB%E5%8A%A1-3-%E7%BB%93%E6%9E%9C"><span class="toc-number">3.1.3.</span> <span class="toc-text">任务 3 结果</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E4%BB%BB%E5%8A%A1-4%EF%BC%9A%E5%88%86%E6%9E%90%E9%BB%91%E5%AE%A2%E6%8C%96%E7%9F%BF%E7%A8%8B%E5%BA%8F%E7%9A%84%E7%9F%BF%E6%B1%A0%E5%9F%9F%E5%90%8D%EF%BC%88FLAG%EF%BC%9Awakuang-zhigongshanfang-top%EF%BC%89"><span class="toc-number">4.</span> <span class="toc-text">四、任务 4：分析黑客挖矿程序的矿池域名（FLAG：wakuang.zhigongshanfang.top）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E7%9B%AE%E6%A0%87-3"><span class="toc-number">4.1.</span> <span class="toc-text">核心目标</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4-1%EF%BC%9A%E6%89%BE%E5%88%B0%E9%BB%91%E5%AE%A2%E8%B4%A6%E6%88%B7%E4%B8%8B%E7%9A%84%E6%8C%96%E7%9F%BF%E7%A8%8B%E5%BA%8F%EF%BC%88Kuang-exe%EF%BC%89"><span class="toc-number">4.1.1.</span> <span class="toc-text">步骤 1：找到黑客账户下的挖矿程序（Kuang.exe）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4-2%EF%BC%9A%E7%94%A8-pyinstxtractor-py-%E8%A7%A3%E5%8C%85-Python-%E6%89%93%E5%8C%85%E7%9A%84-Kuang-exe"><span class="toc-number">4.1.2.</span> <span class="toc-text">步骤 2：用 pyinstxtractor.py 解包 Python 打包的 Kuang.exe</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4-3%EF%BC%9A%E7%94%A8-uncompyle6-%E5%8F%8D%E7%BC%96%E8%AF%91-Kuang-pyc%EF%BC%8C%E6%8F%90%E5%8F%96%E7%9F%BF%E6%B1%A0%E5%9F%9F%E5%90%8D"><span class="toc-number">4.1.3.</span> <span class="toc-text">步骤 3：用 uncompyle6 反编译 Kuang.pyc，提取矿池域名</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BB%BB%E5%8A%A1-4-%E7%BB%93%E6%9E%9C"><span class="toc-number">4.1.4.</span> <span class="toc-text">任务 4 结果</span></a></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/10/09/Windows%E5%AE%9E%E6%88%98-emlog/" title="Windows实战-emlog">Windows实战-emlog</a><time datetime="2025-10-09T10:50:41.000Z" title="发表于 2025-10-09 18:50:41">2025-10-09</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/10/09/blueteam%E7%9A%84%E5%B0%8F%E5%BF%83%E6%80%9D/" title="blueteam的小心思">blueteam的小心思</a><time datetime="2025-10-09T10:49:49.000Z" title="发表于 2025-10-09 18:49:49">2025-10-09</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/10/09/%E6%97%A5%E5%BF%97%E5%88%86%E6%9E%90-mysql%E5%BA%94%E6%80%A5%E5%93%8D%E5%BA%94/" title="日志分析-mysql应急响应">日志分析-mysql应急响应</a><time datetime="2025-10-09T10:49:17.000Z" title="发表于 2025-10-09 18:49:17">2025-10-09</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/10/09/%E6%97%A5%E5%BF%97%E5%88%86%E6%9E%90-apache/" title="日志分析-apache">日志分析-apache</a><time datetime="2025-10-09T10:48:52.000Z" title="发表于 2025-10-09 18:48:52">2025-10-09</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/10/09/Linux%E6%9D%83%E9%99%90%E7%BB%B4%E6%8C%81-%E5%90%8E%E9%97%A8/" title="Linux权限维持-后门">Linux权限维持-后门</a><time datetime="2025-10-09T10:48:24.000Z" title="发表于 2025-10-09 18:48:24">2025-10-09</time></div></div></div></div></div></div></main><footer id="footer" style="background: transparent;"><div class="footer-other"><div class="footer-copyright"><span class="copyright">©&nbsp;2025 By 扬祺</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.0</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"></div><script src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.js"></script><script async="" data-pjax="" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>

