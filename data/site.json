@@ -1,1 +1,27 @@
-{"title":"Q1yl","subtitle":"网络安全学习与实战记录","tagline":"聚焦日志分析、应急响应、Web 安全与蓝队实战，把零散练习整理成方便检索的安全知识库。","author":"扬祺","bio":"以日志分析、Windows 应急、Web 安全和蓝队实战为主，尽量把文章写成可复盘、可检索、可直接套用的格式。","email":"lyq3035762968","location":"China","heroImage":"/img/cover-security.svg","avatar":"/img/avatar.svg","accent":"#0f766e","notice":"本站已按分类重构，后续可以直接在后台新建文章、修改分类和上传图片。","links":[{"label":"全部文章","url":"/#articles"},{"label":"分类入口","url":"/#category"},{"label":"后台管理","url":"/admin/"}]}
+{
+  "title": "Q1yl",
+  "subtitle": "网络安全学习与实战记录",
+  "tagline": "聚焦日志分析、应急响应、Web 安全与蓝队实战，把零散练习整理成方便检索的安全知识库。",
+  "author": "扬祺",
+  "bio": "以日志分析、Windows 应急、Web 安全和蓝队实战为主，尽量把文章写成可复盘、可检索、可直接套用的格式。",
+  "email": "lyq3035762968",
+  "location": "China",
+  "heroImage": "/img/cover-security.svg",
+  "avatar": "/img/avatar.svg",
+  "accent": "#0f766e",
+  "notice": "已从网安资料库导入 146 篇笔记，敏感报告与参考资料默认进入草稿。",
+  "links": [
+    {
+      "label": "全部文章",
+      "url": "/#articles"
+    },
+    {
+      "label": "分类入口",
+      "url": "/#category"
+    },
+    {
+      "label": "后台管理",
+      "url": "/admin/"
+    }
+  ]
+}
