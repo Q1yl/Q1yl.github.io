@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Q1yl | 网络安全博客</title>
+    <meta name="description" content="一个聚焦日志分析、应急响应、Web 安全与蓝队实战的网络安全博客。" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/assets/css/style.css?v=20260314-1" />
+  </head>
+  <body class="page-home">
+    <div class="page-shell">
+      <header class="site-header">
+        <a class="brand" href="/">
+          <span class="brand-mark">Q</span>
+          <span class="brand-copy">
+            <strong>Q1yl</strong>
+            <span>网络安全博客</span>
+          </span>
+        </a>
+        <nav class="site-nav">
+          <a href="#category">分类</a>
+          <a href="#articles">文章</a>
+          <a href="/post.html?slug=webshell查杀">精选</a>
+          <button class="ghost-button" type="button" data-open-admin>后台入口</button>
+        </nav>
+      </header>
+
+      <main>
+        <section class="hero">
+          <div class="hero-copy">
+            <p class="eyebrow">Practical Security Notes</p>
+            <h1 data-site-title>Q1yl</h1>
+            <p class="hero-subtitle" data-site-subtitle>网络安全学习与实战记录</p>
+            <p class="hero-text" data-site-tagline>记录日志分析、应急响应、Web 安全和蓝队实战，把零散练习整理成方便检索的知识库。</p>
+            <div class="hero-actions">
+              <a class="primary-button" href="#articles">开始阅读</a>
+              <button class="ghost-button" type="button" data-open-admin>进入后台</button>
+            </div>
+          </div>
+          <aside class="hero-panel">
+            <div class="hero-panel-card">
+              <p class="panel-label">站点简介</p>
+              <p class="panel-title" data-site-bio>聚焦日志分析、蓝队实战、Web 安全与 Windows 应急，持续沉淀适合复盘和检索的安全文章。</p>
+            </div>
+            <div class="hero-panel-grid" data-home-stats></div>
+          </aside>
+        </section>
+
+        <section class="section-grid">
+          <section class="section-main">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Featured</p>
+                <h2>精选文章</h2>
+              </div>
+              <a class="section-link" href="#articles">查看全部</a>
+            </div>
+            <article class="featured-card" data-featured-card></article>
+          </section>
+
+          <aside class="section-side">
+            <div class="side-card">
+              <p class="panel-label">站点公告</p>
+              <p class="side-copy" data-site-notice>本站文章会逐步按分类重构，后续也可以直接在后台调整分类和内容。</p>
+            </div>
+            <div class="side-card">
+              <div class="side-head">
+                <p class="panel-label">快捷入口</p>
+                <button class="text-button" type="button" data-open-admin>管理内容</button>
+              </div>
+              <div class="quick-links" data-quick-links></div>
+            </div>
+          </aside>
+        </section>
+
+        <section class="section-block" id="category">
+          <div class="section-heading">
+            <div>
+              <p class="eyebrow">Categories</p>
+              <h2>按分类浏览</h2>
+            </div>
+            <span class="section-note">先看方向，再看文章</span>
+          </div>
+          <div class="category-grid" data-category-grid></div>
+        </section>
+
+        <section class="section-grid" id="articles">
+          <section class="section-main">
+            <div class="section-heading">
+              <div>
+                <p class="eyebrow">Articles</p>
+                <h2>全部文章</h2>
+              </div>
+              <span class="section-note" data-result-summary></span>
+            </div>
+            <div class="filter-bar">
+              <label class="search-box">
+                <span>搜索文章</span>
+                <input type="search" placeholder="搜索标题、分类或标签" data-search-input />
+              </label>
+              <div class="filter-chips" data-filter-row></div>
+            </div>
+            <div class="post-list" data-post-list></div>
+          </section>
+
+          <aside class="section-side">
+            <div class="side-card">
+              <p class="panel-label">作者</p>
+              <div class="profile-card">
+                <img src="/img/avatar.svg" alt="作者头像" data-site-avatar />
+                <div>
+                  <p class="profile-name" data-site-author>扬祺</p>
+                  <p class="profile-meta" data-site-location>China</p>
+                </div>
+              </div>
+              <p class="side-copy" data-site-summary>以应急和日志分析为主，尽量把文章写成可以快速复盘和直接使用的形式。</p>
+            </div>
+
+            <div class="side-card">
+              <p class="panel-label">最近更新</p>
+              <div class="mini-list" data-recent-list></div>
+            </div>
+
+            <div class="side-card">
+              <p class="panel-label">归档</p>
+              <div class="mini-list" data-archive-list></div>
+            </div>
+          </aside>
+        </section>
+      </main>
+    </div>
+
+    <div class="auth-modal hidden" data-auth-modal>
+      <div class="auth-backdrop" data-close-auth></div>
+      <div class="auth-dialog">
+        <button class="auth-close" type="button" data-close-auth aria-label="关闭">×</button>
+        <p class="eyebrow">Admin Access</p>
+        <h2>进入后台</h2>
+        <form data-auth-form>
+          <label class="stack-field">
+            <span>密码</span>
+            <input type="password" autocomplete="current-password" data-auth-input />
+          </label>
+          <p class="form-message" data-auth-message></p>
+          <button class="primary-button auth-submit" type="submit">确认进入</button>
+        </form>
+      </div>
+    </div>
+
+    <script src="/assets/js/shared.js?v=20260314-1"></script>
+    <script src="/assets/js/app.js?v=20260314-1"></script>
+  </body>
+</html>

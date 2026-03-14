@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>文章详情 | Q1yl</title>
+    <meta name="description" content="Q1yl 网络安全博客文章详情页。" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/assets/css/style.css?v=20260314-1" />
+  </head>
+  <body class="page-post">
+    <div class="page-shell">
+      <header class="site-header">
+        <a class="brand" href="/">
+          <span class="brand-mark">Q</span>
+          <span class="brand-copy">
+            <strong>Q1yl</strong>
+            <span>网络安全博客</span>
+          </span>
+        </a>
+        <nav class="site-nav">
+          <a href="/">首页</a>
+          <a href="/#category">分类</a>
+          <a href="/#articles">文章</a>
+          <a href="/admin/">后台</a>
+        </nav>
+      </header>
+      <main class="post-layout hidden" data-post-layout>
+        <article class="post-main">
+          <div class="post-hero">
+            <div class="post-meta-row">
+              <a class="pill" href="/" data-post-category></a>
+              <span class="meta-dot"></span>
+              <span data-post-date></span>
+              <span class="meta-dot"></span>
+              <span data-post-readtime></span>
+            </div>
+            <h1 data-post-title></h1>
+            <p class="post-description" data-post-description></p>
+            <div class="post-tags" data-post-tags></div>
+          </div>
+          <div class="post-body prose" data-post-body></div>
+        </article>
+        <aside class="post-side">
+          <div class="side-card">
+            <p class="panel-label">文章目录</p>
+            <div class="mini-list" data-post-outline></div>
+          </div>
+          <div class="side-card">
+            <p class="panel-label">作者信息</p>
+            <div class="profile-card">
+              <img src="/img/avatar.svg" alt="作者头像" data-site-avatar />
+              <div>
+                <p class="profile-name" data-site-author>扬祺</p>
+                <p class="profile-meta" data-site-location>China</p>
+              </div>
+            </div>
+            <p class="side-copy" data-site-bio></p>
+          </div>
+          <div class="side-card">
+            <p class="panel-label">同分类文章</p>
+            <div class="mini-list" data-related-posts></div>
+          </div>
+        </aside>
+      </main>
+      <section class="empty-state hidden" data-post-empty>
+        <p class="eyebrow">Not Found</p>
+        <h1>这篇文章不存在</h1>
+        <p>链接可能已经变更，或者文章还没有发布。</p>
+        <a class="primary-button" href="/">返回首页</a>
+      </section>
+    </div>
+    <script src="/assets/js/shared.js?v=20260314-1"></script>
+    <script src="/assets/js/post.js?v=20260314-1"></script>
+  </body>
+</html>

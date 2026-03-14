@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>后台管理 | Q1yl</title>
+    <meta name="description" content="Q1yl 网络安全博客后台管理页。" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/assets/css/style.css?v=20260314-1" />
+  </head>
+  <body class="page-admin">
+    <div class="admin-lockscreen" data-admin-lockscreen>
+      <div class="admin-lock-card">
+        <p class="eyebrow">Admin Access</p>
+        <h1>后台管理</h1>
+        <form data-admin-auth-form>
+          <label class="stack-field">
+            <span>密码</span>
+            <input type="password" autocomplete="current-password" data-admin-auth-input />
+          </label>
+          <p class="form-message" data-admin-auth-message></p>
+          <button class="primary-button auth-submit" type="submit">进入后台</button>
+        </form>
+      </div>
+    </div>
+    <div class="admin-shell hidden" data-admin-shell>
+      <aside class="admin-sidebar">
+        <div class="admin-brand">
+          <a class="brand" href="/">
+            <span class="brand-mark">Q</span>
+            <span class="brand-copy">
+              <strong>Q1yl</strong>
+              <span>内容管理</span>
+            </span>
+          </a>
+        </div>
+        <section class="admin-card">
+          <div class="admin-card-head">
+            <h2>仓库连接</h2>
+            <button class="text-button" type="button" data-save-config>保存</button>
+          </div>
+          <div class="field-grid">
+            <label class="stack-field">
+              <span>Owner</span>
+              <input type="text" data-config-owner value="Q1yl" />
+            </label>
+            <label class="stack-field">
+              <span>Repo</span>
+              <input type="text" data-config-repo value="Q1yl.github.io" />
+            </label>
+            <label class="stack-field">
+              <span>Branch</span>
+              <input type="text" data-config-branch value="main" />
+            </label>
+            <label class="stack-field">
+              <span>Token</span>
+              <input type="password" data-config-token />
+            </label>
+          </div>
+          <div class="button-row">
+            <button class="primary-button" type="button" data-sync-repo>同步数据</button>
+            <button class="ghost-button" type="button" data-lock-admin>锁定</button>
+          </div>
+          <p class="form-message" data-sync-message></p>
+        </section>
+        <section class="admin-card">
+          <div class="admin-card-head">
+            <h2>文章列表</h2>
+            <button class="text-button" type="button" data-new-post>新建</button>
+          </div>
+          <label class="stack-field">
+            <span>搜索</span>
+            <input type="search" placeholder="搜索标题或分类" data-post-search />
+          </label>
+          <div class="filter-chips compact" data-admin-categories></div>
+          <div class="admin-post-list" data-admin-post-list></div>
+        </section>
+      </aside>
+      <main class="admin-main">
+        <section class="admin-card admin-editor">
+          <div class="admin-card-head">
+            <div>
+              <p class="eyebrow">Editor</p>
+              <h2>文章编辑器</h2>
+            </div>
+            <div class="button-row">
+              <button class="ghost-button" type="button" data-preview-post>预览</button>
+              <button class="primary-button" type="button" data-save-post>保存文章</button>
+              <button class="danger-button" type="button" data-delete-post>删除</button>
+            </div>
+          </div>
+          <div class="field-grid field-grid-wide">
+            <label class="stack-field field-span-2"><span>标题</span><input type="text" data-post-title /></label>
+            <label class="stack-field"><span>Slug</span><input type="text" data-post-slug /></label>
+            <label class="stack-field"><span>状态</span><select data-post-status><option value="published">已发布</option><option value="draft">草稿</option></select></label>
+            <label class="stack-field"><span>分类</span><input type="text" data-post-category /></label>
+            <label class="stack-field"><span>标签</span><input type="text" placeholder="用逗号分隔" data-post-tags /></label>
+            <label class="stack-field"><span>发布时间</span><input type="date" data-post-published /></label>
+            <label class="stack-field"><span>更新时间</span><input type="date" data-post-updated /></label>
+            <label class="stack-field field-span-2"><span>封面路径</span><input type="text" data-post-cover /></label>
+            <label class="stack-field field-span-2"><span>摘要</span><textarea rows="3" data-post-excerpt></textarea></label>
+          </div>
+          <div class="editor-toolbar">
+            <div class="toggle-group">
+              <button class="toggle-button is-active" type="button" data-editor-mode="html">HTML</button>
+              <button class="toggle-button" type="button" data-editor-mode="markdown">Markdown</button>
+            </div>
+            <div class="button-row wrap">
+              <button class="ghost-button small" type="button" data-insert-template="steps">步骤模板</button>
+              <button class="ghost-button small" type="button" data-insert-template="checklist">排查模板</button>
+              <button class="ghost-button small" type="button" data-insert-snippet="code">代码块</button>
+              <button class="ghost-button small" type="button" data-insert-snippet="notice">提示块</button>
+              <button class="ghost-button small" type="button" data-upload-image>上传图片</button>
+              <input class="hidden" type="file" accept="image/*" data-image-input />
+            </div>
+          </div>
+          <div class="editor-grid">
+            <label class="stack-field"><span>正文</span><textarea rows="24" data-post-body></textarea></label>
+            <section class="preview-pane">
+              <div class="preview-head"><p>实时预览</p><span data-preview-mode-label>HTML</span></div>
+              <div class="preview-body prose" data-post-preview></div>
+            </section>
+          </div>
+          <p class="form-message" data-post-message></p>
+        </section>
+        <section class="admin-card">
+          <div class="admin-card-head">
+            <div><p class="eyebrow">Site</p><h2>站点设置</h2></div>
+            <button class="primary-button" type="button" data-save-site>保存站点</button>
+          </div>
+          <div class="field-grid field-grid-wide">
+            <label class="stack-field"><span>站点标题</span><input type="text" data-site-title-input /></label>
+            <label class="stack-field"><span>副标题</span><input type="text" data-site-subtitle-input /></label>
+            <label class="stack-field field-span-2"><span>标语</span><input type="text" data-site-tagline-input /></label>
+            <label class="stack-field"><span>作者</span><input type="text" data-site-author-input /></label>
+            <label class="stack-field"><span>所在地</span><input type="text" data-site-location-input /></label>
+            <label class="stack-field"><span>头像路径</span><input type="text" data-site-avatar-input /></label>
+            <label class="stack-field"><span>主题图路径</span><input type="text" data-site-hero-input /></label>
+            <label class="stack-field"><span>主题色</span><input type="text" data-site-accent-input /></label>
+            <label class="stack-field"><span>邮箱</span><input type="text" data-site-email-input /></label>
+            <label class="stack-field field-span-2"><span>简介</span><textarea rows="3" data-site-bio-input></textarea></label>
+            <label class="stack-field field-span-2"><span>公告</span><textarea rows="3" data-site-notice-input></textarea></label>
+            <label class="stack-field field-span-2"><span>快捷链接 JSON</span><textarea rows="4" data-site-links-input></textarea></label>
+          </div>
+          <p class="form-message" data-site-message></p>
+        </section>
+      </main>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="/assets/js/shared.js?v=20260314-1"></script>
+    <script src="/assets/js/admin.js?v=20260314-1"></script>
+  </body>
+</html>
